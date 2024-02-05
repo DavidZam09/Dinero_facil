@@ -1,5 +1,12 @@
 const Sequelize = require("sequelize");
 
+//desarrollo
+/*const db = new Sequelize('dinero_facil', 'dinero_facil', "eRF_UcsB5fjM3Sn", {
+  dialect: "mysql",
+  host: 'localhost',
+});*/
+
+//produccion
 const db = new Sequelize('dinero_facil', 'root', null, {
   dialect: "mysql",
   host: 'localhost',
