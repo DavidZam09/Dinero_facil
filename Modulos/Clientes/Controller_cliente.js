@@ -1,15 +1,38 @@
 const { validationResult } = require("express-validator");
-const Usuario = require("./Services_usuario");
+var fs = require("fs");
+const Cliente = require("./Services_cliente");
 
 module.exports = {
-    lista_roles,
-    lista_tipo_doc,
-    lista_users,
-    lista_usersxrol,
-    input_user,
-    login_user,
+    dptxciudades,
+    lista_cliente_tipos,
+    registrar_cliente
+    
 };
 
+function dptxciudades(req, res, next) {
+    fs.readFile(__dirname + "/dpt_y_ciudades.json", 'utf8', function (err, data) {
+        res.set({ 'content-type': 'application/json; charset=utf-8' });
+        res.end( data );
+    });
+}
+
+function lista_cliente_tipos(req, res, next) {
+    Cliente.lista_cliente_tipos().then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+function registrar_cliente(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
+    Cliente.registrar_cliente(req.query).then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+/*
 function lista_roles(req, res, next) {
     Usuario.lista_roles().then((respuerta) => {
         return res.send(respuerta);
@@ -63,3 +86,4 @@ function login_user(req, res, next) {
         return res.send(respuerta);
     });
 }
+*/

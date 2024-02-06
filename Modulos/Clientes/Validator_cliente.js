@@ -1,8 +1,11 @@
 const { body, check } = require('express-validator');
-const Rol = require('./Model_rol');
-const Tipo_doc = require('./Model_tipo_doc');
-const User = require('./Model_usuario');
+///const Rol = require('./Model_rol');
+//const Tipo_doc = require('./Model_clientes_tipo');
+const User = require('./Model_cliente');
 
+
+
+/*
 const lista_usersxrol = [
    check('id', 'Invalido Rol').isInt().exists().custom(data => {
          return new Promise((resolve, reject) => {
@@ -73,10 +76,28 @@ const input_user = [
      })
   })
 ]
+*/
+
+const registrar_cliente = [
+   check('cod_referido').exists().withMessage('La variable Password no existe'),
+   //body('password').optional({ nullable: false }).exists().withMessage('La variable Password no existe'),
+   check('password').isLength({ min: 6, max: 16 }).withMessage('El campo debe tener entre 6 y 16 caracteres'),
+   check('password').matches(/^(?=.*[A-Z])(?=.*\d).+$/).withMessage('El campo debe contener al menos una letra mayúscula y un número'),
+   check('email').isEmail().withMessage('Solo se admiten correos'),
+   check('email', 'Invalid Email').exists().custom(data => {
+      return new Promise((resolve, reject) => {
+         User.findOne({ where: { email: data } })
+            .then(Exist => {
+               if (Exist !== null) {
+                  reject(new Error('Email ya existe.'))
+               } else {
+                  resolve(true)
+               }
+            })
+      })
+   })
+];
 
 module.exports = {
-   lista_usersxrol,
-   lista_users,
-   login_user,
-   input_user
+   registrar_cliente
 }
