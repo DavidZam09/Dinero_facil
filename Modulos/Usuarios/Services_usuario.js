@@ -170,7 +170,7 @@ async function login_user(data) {
                 user: obj
             }
         }else{  
-            return { successful: false, error: "pass invalido" }
+            return { successful: false, error: "password invalido" }
         }
     });
 
