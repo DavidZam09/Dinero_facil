@@ -155,7 +155,10 @@ async function login_user(data) {
                 num_doc: user.num_doc,
                 direccion: user.direccion,
                 nombre_rol: user.nombre_rol,
-                nombre_tipo_doc: user.nombre_tipo_doc
+                nombre_tipo_doc: user.nombre_tipo_doc,
+                activo: activo,
+                createdAt: createdAt,
+                updatedAt: updatedAt
             };
 
             var token = jwt.sign(
