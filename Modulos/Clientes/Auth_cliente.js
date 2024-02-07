@@ -7,8 +7,8 @@ const verifyToken = (req, res, next) => {
     return res.send({ successful: false, error: "Se requiere autenticacion por Token" });
   }
   try {
-    const decoded = jwt.verify(token, process.env.SAL_USER);
-    req.user = decoded;
+    const decoded = jwt.verify(token, process.env.SAL_CLIENTE);
+    req.cliente = decoded;
   } catch (err) {
     return res.send({ successful: false, error: "Token invalido" });
   }

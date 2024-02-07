@@ -1,6 +1,7 @@
 const { QueryTypes } = require('sequelize');
 const SQL = require('sequelize');
 const bcrypt = require('bcrypt');
+const jwt = require("jsonwebtoken");
 
 const Clientes_tipo = require('./Model_clientes_tipo');
 const Cliente = require('./Model_cliente');
@@ -14,7 +15,8 @@ function generarCodigoUnico() {
 
 module.exports = {
     lista_cliente_tipos,
-    registrar_cliente
+    registrar_cliente,
+    login_cliente
 };
 
 async function lista_cliente_tipos() {
@@ -52,4 +54,43 @@ async function registrar_cliente(data) {
         console.log(error);
         return { successful: false, error: error };
     }
+}
+
+async function login_cliente(data) {
+
+    var select = `SELECT c.*, ct.nombre_tipo_cliente FROM clientes c 
+    inner join cliente_tipos as ct on ct.id = c.id_cliente_tipo
+    where c.email = '${data.email}' limit 1`;
+
+    var cliente = await Cliente.sequelize.query(select, { type: QueryTypes.SELECT });
+    cliente = cliente[0];
+
+    return await bcrypt.compare(data.password, cliente.password).then(async (respuerta) => {
+        if (respuerta) {
+            var obj = {
+                id: cliente.id,
+                id_cliente_tipo: cliente.id_cliente_tipo,
+                email: cliente.email,
+                cod_referido: cliente.cod_referido,
+                cod_personal: cliente.cod_personal,
+                nombre_tipo_cliente: cliente.nombre_tipo_cliente,
+                createdAt: cliente.createdAt,
+                updatedAt: cliente.updatedAt
+            };
+
+            var token = jwt.sign(
+                obj,
+                process.env.SAL_CLIENTE,
+                { expiresIn: "24h", }
+            );
+
+            return {
+                successful: true,
+                token: token,
+                cliente: obj
+            }
+        } else {
+            return { successful: false, error: "password invalido" }
+        }
+    });
 }
