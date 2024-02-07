@@ -130,7 +130,7 @@ async function update_user(data) {
     };
 
     if ((data.password === '') || (data.password === null)) { } else {
-        const salt = await bcrypt.genSalt(process.env.SAL);
+        const salt = await bcrypt.genSalt(process.env.SAL_ROUND);
         obj.password = await bcrypt.hash(data.password, salt);
     }
 

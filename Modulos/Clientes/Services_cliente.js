@@ -42,8 +42,8 @@ async function registrar_cliente(data) {
         }    
     } while (ban);
 
-    const salt = await bcrypt.genSalt(process.env.SAL);
-    data.password = await bcrypt.hash(data.password, salt);
+    const salt = bcrypt.genSalt(process.env.SAL_ROUND);
+    data.password = bcrypt.hash(data.password, salt);
     data.cod_personal = cod;
     data.id_cliente_tipo = 1;
 

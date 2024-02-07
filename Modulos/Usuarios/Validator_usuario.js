@@ -49,18 +49,18 @@ const input_user = [
    body('direccion').notEmpty().withMessage('variable no existe'),
    body('activo').isBoolean().withMessage('Solo valores booleanos'),
    body('id_user_rol', 'Invalido Rol').isInt().exists().custom(data => {
-         return new Promise((resolve, reject) => {
-         Rol.findOne({ where: { id: data } })
-            .then(Exist => {
-               if (Exist === null) {
-                  reject(new Error('Rol no existe.'))
-               } else {
-                  resolve(true)
-               }
-            })
-        })
-     }),
-     body('id_user_tipo_doc', 'Invalido Tipo Documento').isInt().exists().custom(data => {
+      return new Promise((resolve, reject) => {
+      Rol.findOne({ where: { id: data } })
+         .then(Exist => {
+            if (Exist === null) {
+               reject(new Error('Rol no existe.'))
+            } else {
+               resolve(true)
+            }
+         })
+      })
+   }),
+   body('id_user_tipo_doc', 'Invalido Tipo Documento').isInt().exists().custom(data => {
       return new Promise((resolve, reject) => {
          Tipo_doc.findOne({ where: { id: data } })
          .then(Exist => {
@@ -70,8 +70,8 @@ const input_user = [
                resolve(true)
             }
          })
-     })
-  })
+      })
+   })
 ]
 
 module.exports = {

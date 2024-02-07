@@ -21,6 +21,11 @@ const Cliente = sequelize.define("cliente", {
         type: DataTypes.STRING,
         allowNull: false,
     },
+    num_celular: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+    },
     cod_referido: {
         type: DataTypes.STRING,
         allowNull: true,
