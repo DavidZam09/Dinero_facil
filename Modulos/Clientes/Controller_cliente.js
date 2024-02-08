@@ -6,7 +6,9 @@ module.exports = {
     dptxciudades,
     lista_cliente_tipos,
     registrar_cliente,
-    login_cliente
+    login_cliente,
+    lista_actividad_eco,
+    lista_sector_eco
     
 };
 
@@ -39,6 +41,18 @@ function login_cliente(req, res, next) {
         return res.json({ successful: false, errors: errors.array() });
     }
     Cliente.login_cliente(req.body).then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+function lista_actividad_eco(req, res, next) {
+    Cliente.lista_actividad_eco().then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+function lista_sector_eco(req, res, next) {
+    Cliente.lista_sector_eco().then((respuerta) => {
         return res.send(respuerta);
     });
 }

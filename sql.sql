@@ -1,31 +1,111 @@
--- phpMyAdmin SQL Dump
--- version 5.2.1
--- https://www.phpmyadmin.net/
---
--- Servidor: 127.0.0.1
--- Tiempo de generación: 07-02-2024 a las 23:27:04
--- Versión del servidor: 10.4.32-MariaDB
--- Versión de PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
-SET time_zone = "+00:00";
+SET time_zone = "-05:00";
 
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
+-- Volcando estructura de base de datos para dinero_facil
+CREATE DATABASE IF NOT EXISTS `dinero_facil` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
+USE `dinero_facil`;
 
---
--- Base de datos: `dinero_facil`
---
+-- Volcando estructura para tabla dinero_facil.cliente_actividad_ecos
+CREATE TABLE IF NOT EXISTS `cliente_actividad_ecos` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre_actividad_eco` varchar(50) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- --------------------------------------------------------
+-- Volcando datos para la tabla dinero_facil.cliente_actividad_ecos: ~22 rows (aproximadamente)
+INSERT INTO `cliente_actividad_ecos` (`id`, `nombre_actividad_eco`, `createdAt`, `updatedAt`) VALUES
+	(1, 'Almacén / Logística / Transporte', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(2, 'Administración / Oficina', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(3, 'Ventas', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(4, 'Contabilidad / Finanzas', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(5, 'Producción / Operarios / Manufactura', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(6, 'CallCenter / Telemercadeo', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(7, 'Medicina / Salud', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(8, 'Atención a clientes', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(9, 'Servicios Generales, Aseo y Seguridad', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(10, 'Mantenimiento y Reparaciones Técnicas', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(11, 'Hostelería / Turismo', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(12, 'Construcción y obra', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(13, 'Recursos Humanos', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(14, 'Informática / Telecomunicaciones', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(15, 'Compras / Comercio Exterior', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(16, 'Investigación y Calidad', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(17, 'Mercadotecnia / Publicidad / Comunicación', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(18, 'Ingeniería', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(19, 'Legal / Asesoría', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(20, 'Docencia', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(21, 'Dirección / Gerencia', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
+	(22, 'Otros', '2024-02-08 03:47:52', '2024-02-08 03:47:52');
 
---
--- Estructura de tabla para la tabla `clientes`
---
+-- Volcando estructura para tabla dinero_facil.cliente_info
+CREATE TABLE IF NOT EXISTS `cliente_info` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_cliente` bigint(20) NOT NULL,
+  `id_dpto` bigint(20) NOT NULL,
+  `id_ciudad` bigint(20) NOT NULL,
+  `id_user_tipo_doc` bigint(20) NOT NULL,
+  `id_cliente_actividad_eco` bigint(20) NOT NULL,
+  `id_cliente_sector_eco` bigint(20) NOT NULL,
+  `id_usuario` bigint(20) DEFAULT NULL,
+  `nombres_cliente` varchar(100) NOT NULL,
+  `apellidos_cliente` varchar(100) NOT NULL,
+  `fecha_nac` date NOT NULL,
+  `fecha_aprobacion` date DEFAULT NULL,
+  `direccion` varchar(100) NOT NULL,
+  `num_documento` varchar(20) NOT NULL,
+  `otro_sector_y_actividad` varchar(100) DEFAULT NULL,
+  `nombre_empresa_labora` varchar(50) NOT NULL,
+  `ingreso_mesual` bigint(20) NOT NULL,
+  `gasto_mensual` bigint(20) NOT NULL,
+  `foto_doc_frontal` varchar(100) NOT NULL,
+  `foto_doc_trasera` varchar(100) NOT NULL,
+  `foto_recivo_publico` varchar(100) DEFAULT NULL,
+  `foto_pago_nomina` varchar(100) DEFAULT NULL,
+  `tratamiento_datos` tinyint(4) NOT NULL DEFAULT 1,
+  `terminos_y_condiciones` tinyint(4) NOT NULL DEFAULT 1,
+  `rf1_nombre_completo` varchar(100) NOT NULL,
+  `rf1_num_celular` varchar(20) NOT NULL,
+  `rf1_direccion` varchar(100) NOT NULL,
+  `rf2_nombre_completo` varchar(100) NOT NULL,
+  `rf2_num_celular` varchar(20) NOT NULL,
+  `rf2_direccion` varchar(100) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.cliente_info: ~0 rows (aproximadamente)
+
+-- Volcando estructura para tabla dinero_facil.cliente_sector_ecos
+CREATE TABLE IF NOT EXISTS `cliente_sector_ecos` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre_sector_eco` varchar(50) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.cliente_sector_ecos: ~14 rows (aproximadamente)
+INSERT INTO `cliente_sector_ecos` (`id`, `nombre_sector_eco`, `createdAt`, `updatedAt`) VALUES
+	(1, 'Explotación de minas y canteras', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(2, 'Actividades de apoyo a la gestión pública', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(3, 'Telecomunicaciones', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(4, 'Actividades profesionales y técnicas', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(5, 'Manufactura', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(6, 'Financieras y de seguros (excepto bancos, cooperat', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(7, 'Artes, entretenimiento y recreación', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(8, 'Agricultura y pesca', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(9, 'Banca', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(10, 'Suministro de electricidad, gas, y A/C', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(11, 'Distribución de agua y saneamiento Salud humana y ', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(12, 'Comercio', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(13, 'Transporte y almacenamiento', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
+	(14, 'Otro', '2024-02-08 03:53:31', '2024-02-08 03:53:31');
 
 CREATE TABLE `clientes` (
   `id` bigint(20) UNSIGNED NOT NULL,
@@ -47,67 +127,6 @@ INSERT INTO `clientes` (`id`, `id_cliente_tipo`, `email`, `num_celular`, `passwo
 (1, 1, 'test001@gmail.com', 0, '$2b$10$Mmym6f49uFclPsvapOPDlOPqzVJKNky/oJnmi9Xnezbs9Cdyn.AgC', '', '972b924adc', '2024-02-06 21:44:51', '2024-02-06 21:44:51');
 
 -- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `cliente_actividad_eco`
---
-
-CREATE TABLE `cliente_actividad_eco` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `nombre_actividad_eco` varchar(50) NOT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `cliente_actividad_eco`
---
-
-INSERT INTO `cliente_actividad_eco` (`id`, `nombre_actividad_eco`, `createdAt`, `updatedAt`) VALUES
-(1, 'Agricultura', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(2, 'Ganadería', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(3, 'Pesca', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(4, 'Minería', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(5, 'Construcción', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(6, 'Manufactura', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(7, 'Comercio', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(8, 'Transporte', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(9, 'Turismo', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(10, 'Servicios financieros', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(11, 'Educación', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(12, 'Salud', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(13, 'Tecnología de la información', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(14, 'Ingeniería', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(15, 'Consultoría', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(16, 'Servicios legales', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(17, 'Medios de comunicación', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(18, 'Entretenimiento', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(19, 'Arte y cultura', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(20, 'Restauración y hostelería', '2024-02-07 17:16:21', '2024-02-07 17:16:21'),
-(21, 'Otro', '2024-02-07 17:17:24', '2024-02-07 17:17:24');
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `cliente_info`
---
-
-CREATE TABLE `cliente_info` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `id_dpto` bigint(20) NOT NULL,
-  `id_ciudad` bigint(20) NOT NULL,
-  `id_user_tipo_doc` bigint(20) NOT NULL,
-  `nombres_cliente` varchar(100) NOT NULL,
-  `apellidos_cliente` varchar(100) NOT NULL,
-  `direccion` varchar(100) NOT NULL,
-  `num_documento` varchar(20) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `cliente_tipos`
---
 
 CREATE TABLE `cliente_tipos` (
   `id` bigint(20) UNSIGNED NOT NULL,
@@ -324,3 +343,5 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+
+

@@ -4,6 +4,8 @@ const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 
 const Clientes_tipo = require('./Model_clientes_tipo');
+const Actividad_eco = require('./Model_clientes_actividad_eco');
+const Sector_eco = require('./Model_clientes_sector_eco');
 const Cliente = require('./Model_cliente');
 const { v4: uuidv4 } = require('uuid');
 
@@ -16,7 +18,9 @@ function generarCodigoUnico() {
 module.exports = {
     lista_cliente_tipos,
     registrar_cliente,
-    login_cliente
+    login_cliente,
+    lista_actividad_eco,
+    lista_sector_eco
 };
 
 async function lista_cliente_tipos() {
@@ -93,4 +97,12 @@ async function login_cliente(data) {
             return { successful: false, error: "password invalido" }
         }
     });
+}
+
+async function lista_actividad_eco() {
+    return ({ successful: true, data: await Actividad_eco.findAll() });
+}
+
+async function lista_sector_eco() {
+    return ({ successful: true, data: await Sector_eco.findAll() });
 }
