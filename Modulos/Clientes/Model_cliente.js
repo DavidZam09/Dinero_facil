@@ -1,7 +1,7 @@
 const sequelize = require('../../config_db');
 const { DataTypes } = require("sequelize");
 const Cliente_tipos = require('./Model_clientes_tipo');
-//const Tipo_doc = require('./Model_clientes_tipo');
+const User = require('../Usuarios/Model_usuario');
 
 const Cliente = sequelize.define("cliente", {
     id_cliente_tipo: {
@@ -11,6 +11,18 @@ const Cliente = sequelize.define("cliente", {
             model: Cliente_tipos,
             key: 'id'
         }
+    },
+    id_usuario: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    references: {
+            model: User,
+            key: 'id'
+        }
+    },
+    fecha_aprobacion: {
+        type: DataTypes.DATE,
+        allowNull: true,
     },
     email: {
         type: DataTypes.STRING,

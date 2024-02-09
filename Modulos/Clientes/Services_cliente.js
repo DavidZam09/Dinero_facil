@@ -20,7 +20,9 @@ module.exports = {
     registrar_cliente,
     login_cliente,
     lista_actividad_eco,
-    lista_sector_eco
+    lista_sector_eco,
+    create_cliente_info,
+    update_cliente_info
 };
 
 async function lista_cliente_tipos() {
@@ -105,4 +107,83 @@ async function lista_actividad_eco() {
 
 async function lista_sector_eco() {
     return ({ successful: true, data: await Sector_eco.findAll() });
+}
+
+async function create_cliente_info(data) {
+
+
+
+    var obj = {
+        id_user_tipo_doc: data.id_user_tipo_doc,
+        id_user_rol: data.id_user_rol,
+        nombre_completo: data.nombre_completo,
+        email: data.email,
+        num_celular: data.num_celular,
+        num_doc: data.num_doc,
+        direccion: data.direccion,
+        activo: data.activo
+    };
+
+    if ((data.password === '') || (data.password === null)) {
+        return { successful: false, error: "El campo Contraseña es requerido" };
+    }
+    const salt = await bcrypt.genSalt(process.env.SAL);
+    obj.password = await bcrypt.hash(data.password, salt);
+
+    try {
+        var new_user = await User.create(obj);
+        return lista_users(new_user.id);
+    } catch (error) {
+        console.log(error);
+        return { successful: false, error: error };
+    }
+
+}
+
+async function update_cliente_info(data) {
+    const Op = SQL.Op;
+    var user = await User.findOne({ where: { id: data.id } });
+    if (user === null) {
+        return { successful: false, error: "Usuario no existe" };
+    }
+
+    var validar1 = await User.findOne({ where: { num_celular: data.num_celular, id: { [Op.ne]: data.id } } });
+    if (validar1 !== null) {
+        return { successful: false, error: "Celular ya existe" };
+    }
+
+    var validar2 = await User.findOne({ where: { email: data.email, id: { [Op.ne]: data.id } } });
+    if (validar2 !== null) {
+        return { successful: false, error: "Correo ya existe" };
+    }
+
+    var validar3 = await User.findOne({ where: { num_doc: data.num_doc, id: { [Op.ne]: data.id } } });
+    if (validar3 !== null) {
+        return { successful: false, error: "Numero de documento ya existe" };
+    }
+
+    var obj = {
+        id: data.id,
+        id_user_tipo_doc: data.id_user_tipo_doc,
+        id_user_rol: data.id_user_rol,
+        nombre_completo: data.nombre_completo,
+        email: data.email,
+        num_celular: data.num_celular,
+        num_doc: data.num_doc,
+        direccion: data.direccion,
+        activo: data.activo
+    };
+
+    if ((data.password === '') || (data.password === null)) { } else {
+        const salt = await bcrypt.genSalt(process.env.SAL_ROUND);
+        obj.password = await bcrypt.hash(data.password, salt);
+    }
+
+    try {
+        user.update(obj);
+        return lista_users(data.id);
+    } catch (error) {
+        console.log(error);
+        return { successful: false, error: error };
+    }
 }

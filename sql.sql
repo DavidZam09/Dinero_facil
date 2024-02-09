@@ -43,7 +43,7 @@ INSERT INTO `cliente_actividad_ecos` (`id`, `nombre_actividad_eco`, `createdAt`,
 	(22, 'Otros', '2024-02-08 03:47:52', '2024-02-08 03:47:52');
 
 -- Volcando estructura para tabla dinero_facil.cliente_info
-CREATE TABLE IF NOT EXISTS `cliente_info` (
+CREATE TABLE IF NOT EXISTS `cliente_infos` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `id_cliente` bigint(20) NOT NULL,
   `id_dpto` bigint(20) NOT NULL,

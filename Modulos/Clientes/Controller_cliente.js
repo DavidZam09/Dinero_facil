@@ -8,7 +8,8 @@ module.exports = {
     registrar_cliente,
     login_cliente,
     lista_actividad_eco,
-    lista_sector_eco
+    lista_sector_eco,
+    input_cliente_info
     
 };
 
@@ -55,4 +56,16 @@ function lista_sector_eco(req, res, next) {
     Cliente.lista_sector_eco().then((respuerta) => {
         return res.send(respuerta);
     });
+}
+
+function input_cliente_info(req, res, next) {
+    if (req.body.id === "" || req.body.id === null) {
+        return Cliente.create_cliente_info(req.body).then((respuerta) => {
+            return res.send(respuerta);
+        });
+    } else {
+        return Cliente.update_cliente_info(req.body).then((respuerta) => {
+            return res.send(respuerta);
+        });
+    }
 }

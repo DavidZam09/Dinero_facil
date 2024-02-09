@@ -11,6 +11,9 @@ app.get('/clientes/registrar_cliente', Val.registrar_cliente, clientes.registrar
 app.post('/clientes/login_cliente', Val.login_cliente, clientes.login_cliente);
 app.get('/clientes/lista_actividad_eco', clientes.lista_actividad_eco);
 app.get('/clientes/lista_sector_eco', clientes.lista_sector_eco);
+app.post('/clientes/input_cliente_info', clientes.input_cliente_info);
+
+
 
 module.exports = app;
 

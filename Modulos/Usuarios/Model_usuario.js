@@ -34,12 +34,12 @@ const User = sequelize.define("users", {
         unique: true
     },
     num_celular: {
-        type: DataTypes.STRING,
+        type: DataTypes.INTEGER,
         allowNull: false,
         unique: true
     },
     num_doc: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
         unique: true
     },
