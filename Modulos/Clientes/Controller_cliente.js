@@ -9,6 +9,7 @@ module.exports = {
     login_cliente,
     lista_actividad_eco,
     lista_sector_eco,
+    lista_cliente_info,
     input_cliente_info
     
 };
@@ -54,6 +55,16 @@ function lista_actividad_eco(req, res, next) {
 
 function lista_sector_eco(req, res, next) {
     Cliente.lista_sector_eco().then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+function lista_cliente_info(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
+    Cliente.lista_cliente_info(req.query.id).then((respuerta) => {
         return res.send(respuerta);
     });
 }

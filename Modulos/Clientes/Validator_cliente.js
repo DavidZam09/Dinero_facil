@@ -1,5 +1,8 @@
 const { body, check } = require('express-validator');
-const User = require('./Model_cliente');
+const Cliente = require('./Model_cliente');
+const Cliente_info = require('./Model_clientes_info');
+
+/* validacion de cliente */
 
 const registrar_cliente = [
    check('cod_referido').exists().withMessage('La variable Password no existe'),
@@ -7,7 +10,7 @@ const registrar_cliente = [
    check('password').matches(/^(?=.*[A-Z])(?=.*\d).+$/).withMessage('El campo debe contener al menos una letra mayúscula y un número'),
    check('num_celular', 'Invalid num_celular').exists().custom(data => {
       return new Promise((resolve, reject) => {
-         User.findOne({ where: { num_celular: data } })
+         Cliente.findOne({ where: { num_celular: data } })
             .then(Exist => {
                if (Exist !== null) {
                   reject(new Error('num_celular ya existe.'))
@@ -20,7 +23,7 @@ const registrar_cliente = [
    check('email').isEmail().withMessage('Solo se admiten correos'),
    check('email', 'Invalid Email').exists().custom(data => {
       return new Promise((resolve, reject) => {
-         User.findOne({ where: { email: data } })
+         Cliente.findOne({ where: { email: data } })
             .then(Exist => {
                if (Exist !== null) {
                   reject(new Error('Email ya existe.'))
@@ -37,7 +40,7 @@ const login_cliente = [
    body('email').isEmail().withMessage('Solo se admiten correos'),
    body('email', 'Invalid Email').exists().custom(data => {
       return new Promise((resolve, reject) => {
-         User.findOne({ where: { email: data } })
+         Cliente.findOne({ where: { email: data } })
             .then(Exist => {
                if (Exist === null) {
                   reject(new Error('Email no existe.'))
@@ -49,7 +52,37 @@ const login_cliente = [
    })
 ];
 
+/* validacion de cliente_info */
+
+const lista_cliente_info = [
+   check('id', 'Invalido Cliente').isInt().exists().custom(data => {
+      return new Promise((resolve, reject) => {
+         Cliente.findOne({ where: { id: data } })
+         .then(Exist => {
+            if (Exist === null) {
+               reject(new Error('Cliente no existe.'))
+            } else {
+               resolve(true)
+            }
+         })
+      })
+   }),
+   /*check('id', 'Invalido Cliente_info').isInt().exists().custom(data => {
+      return new Promise((resolve, reject) => {
+         Cliente_info.findOne({ where: { id: data } })
+         .then(Exist => {
+            if (Exist === null) {
+               reject(new Error('Cliente_info no existe.'))
+            } else {
+               resolve(true)
+            }
+         })
+      })
+   })*/
+];
+
 module.exports = {
    registrar_cliente,
-   login_cliente
+   login_cliente,
+   lista_cliente_info
 }
