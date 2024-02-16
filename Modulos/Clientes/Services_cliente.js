@@ -2,8 +2,9 @@ const { QueryTypes } = require('sequelize');
 const SQL = require('sequelize');
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
-const path = require('path');
 const fs = require('fs');
+var path = require('path');
+const Busboy = require('busboy');
 
 const Clientes_tipo = require('./Model_clientes_tipo');
 const Cliente = require('./Model_cliente');
@@ -13,6 +14,7 @@ const Sector_eco = require('./Model_clientes_sector_eco');
 const Cliente_info = require('./Model_clientes_info');
 
 const { v4: uuidv4 } = require('uuid');
+const { log } = require('console');
 
 function generarCodigoUnico() {
     const uuid = uuidv4();
@@ -27,7 +29,7 @@ module.exports = {
     lista_actividad_eco,
     lista_sector_eco,
     create_cliente_info,
-    lista_cliente_info,
+    lista_cliente_infoxcliente,
     update_cliente_info
 };
 
@@ -119,34 +121,14 @@ async function lista_sector_eco() {
     return ({ successful: true, data: await Sector_eco.findAll() });
 }
 
-async function lista_cliente_info(id) {
+async function lista_cliente_infoxcliente(id) {
     return ({ successful: true, data: await Cliente_info.findOne({ where: { id_cliente: parseInt(id) } }) });
 }
 
-async function create_cliente_info(data) {
+async function create_cliente_info( req ) {
 
-    var id = await Cliente_info.max('id');
-    //console.log(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + id);
-
-    // Crear un directorio para guardar la foto si no existe
-    const uploadDir = path.join(__dirname, 'uploads\\'+ id);
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-
-    return ;  
-    // Mover el archivo a la carpeta de destino
-    const oldPath = req.file.path;
-    const newPath = path.join(uploadDir, req.file.originalname);
-    fs.rename(oldPath, newPath, (err) => {
-      if (err) {
-        console.error('Error al mover el archivo:', err);
-        return res.status(500).json({ error: 'Error al guardar el archivo' });
-      }
-      // Archivo guardado con éxito
-      res.status(200).json({ message: 'Archivo guardado con éxito' });
-    });
-
+    const busboy = Busboy({ headers: req.headers });
+    var data = req.body;
 
     var obj = {
         id_cliente: data.id_cliente,
@@ -164,10 +146,11 @@ async function create_cliente_info(data) {
         nombre_empresa_labora: data.nombre_empresa_labora,
         ingreso_mesual: data.ingreso_mesual,
         gasto_mensual: data.gasto_mensual,
-        foto_doc_frontal: data.foto_doc_frontal,
-        foto_doc_trasera: data.foto_doc_trasera,
-        foto_recivo_publico: data.foto_recivo_publico,
-        foto_pago_nomina: data.foto_pago_nomina,
+        foto_cliente: '',
+        foto_doc_frontal: '',
+        foto_doc_trasera: '',
+        foto_recivo_publico: '',
+        foto_pago_nomina: '',
         tratamiento_datos: data.tratamiento_datos,
         terminos_y_condiciones: data.terminos_y_condiciones,
         rf1_nombre_completo: data.rf1_nombre_completo,
@@ -178,17 +161,58 @@ async function create_cliente_info(data) {
         rf2_direccion: data.rf2_direccion
     };
 
-    /*const salt = await bcrypt.genSalt(process.env.SAL);
-    obj.password = await bcrypt.hash(data.password, salt);
+    var uploadDir = '';
+    try {
+        //genera carpeta
+        var  id = await Cliente_info.max('id')+1;
+        var dir = '../../uploads/' + id;    
+        uploadDir = path.join(__dirname, dir);
+    
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+    } catch (error) {
+        return ({ successful: false, data: "Ocurrio un error al intentar crear la carpeta de los archivos" });
+    }
+
+    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+        //const saveTo = path.join(__dirname, 'uploads', filename);
+        var ext = filename.filename.split('.')[1];
+        const nombreArchivo = `${fieldname}.${ext}`;
+        filePath = `./uploads/${id}/${nombreArchivo}`;
+        file.pipe(fs.createWriteStream(filePath));
+        console,log(fieldname);
+
+        switch (fieldname) {
+            case "foto_cliente":
+                obj.foto_cliente = filePath;
+                break;
+            case "foto_doc_frontal":
+                obj.foto_doc_frontal = filePath;
+                break;
+            case "foto_doc_trasera":
+                obj.foto_doc_trasera = filePath;
+                break;
+            case "foto_recivo_publico":
+                obj.foto_recivo_publico = filePath;
+                break;
+            case "foto_pago_nomina":
+                obj.foto_pago_nomina = filePath;
+                break;
+            default: null;
+                break;
+        }
+    });
+
+    req.pipe(busboy);
+
 
     try {
-        var new_user = await User.create(obj);
-        return lista_users(new_user.id);
+        const cliente_info = await Cliente_info.create(obj);
+        return lista_cliente_infoxcliente( cliente_info.id_cliente )
     } catch (error) {
-        console.log(error);
-        return { successful: false, error: error };
-    }*/
-
+        return({ successful: false, data: error });
+    }
 }
 
 async function update_cliente_info(data) {
@@ -238,3 +262,15 @@ async function update_cliente_info(data) {
         return { successful: false, error: error };
     }
 }
+
+    //try {
+    //req.pipe(busboy);
+    /*} catch (error) {
+        //borro archivos
+        const archivos = fs.readdirSync(uploadDir);
+        archivos.forEach(archivo => {
+            const rutaArchivo = path.join(uploadDir, archivo);
+            fs.unlinkSync(rutaArchivo);
+        });
+        return({ successful: false, data: "Ocurrio un error al intentar subir los archivos" });
+    }*/

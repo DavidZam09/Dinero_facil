@@ -9,7 +9,7 @@ module.exports = {
     login_cliente,
     lista_actividad_eco,
     lista_sector_eco,
-    lista_cliente_info,
+    lista_cliente_infoxcliente,
     input_cliente_info
     
 };
@@ -59,24 +59,30 @@ function lista_sector_eco(req, res, next) {
     });
 }
 
-function lista_cliente_info(req, res, next) {
+function lista_cliente_infoxcliente(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.json({ successful: false, errors: errors.array() });
     }
-    Cliente.lista_cliente_info(req.query.id).then((respuerta) => {
+    Cliente.lista_cliente_infoxcliente(req.query.id).then((respuerta) => {
         return res.send(respuerta);
     });
 }
 
-function input_cliente_info(req, res, next) {
+
+async  function input_cliente_info(req, res, next) {
+    return Cliente.create_cliente_info(req).then((respuerta) => {
+        return res.send(respuerta);
+    });
+
+    /*console.log(req.body);
     if (req.body.id === "" || req.body.id === null) {
-        return Cliente.create_cliente_info(req.body).then((respuerta) => {
+        return Cliente.create_cliente_info(req).then((respuerta) => {
             return res.send(respuerta);
         });
     } else {
-        return Cliente.update_cliente_info(req.body).then((respuerta) => {
+        return Cliente.update_cliente_info(req).then((respuerta) => {
             return res.send(respuerta);
         });
-    }
+    }*/
 }

@@ -83,6 +83,10 @@ const cliente_info = sequelize.define("cliente_info", {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  foto_cliente: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   foto_doc_frontal: {
     type: DataTypes.STRING,
     allowNull: false,

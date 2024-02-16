@@ -54,7 +54,7 @@ const login_cliente = [
 
 /* validacion de cliente_info */
 
-const lista_cliente_info = [
+const lista_cliente_infoxcliente = [
    check('id', 'Invalido Cliente').isInt().exists().custom(data => {
       return new Promise((resolve, reject) => {
          Cliente.findOne({ where: { id: data } })
@@ -84,5 +84,5 @@ const lista_cliente_info = [
 module.exports = {
    registrar_cliente,
    login_cliente,
-   lista_cliente_info
+   lista_cliente_infoxcliente
 }
