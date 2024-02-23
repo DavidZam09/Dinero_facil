@@ -71,11 +71,7 @@ function lista_cliente_infoxcliente(req, res, next) {
 
 
 async  function input_cliente_info(req, res, next) {
-    return Cliente.create_cliente_info(req).then((respuerta) => {
-        return res.send(respuerta);
-    });
 
-    /*console.log(req.body);
     if (req.body.id === "" || req.body.id === null) {
         return Cliente.create_cliente_info(req).then((respuerta) => {
             return res.send(respuerta);
@@ -84,5 +80,5 @@ async  function input_cliente_info(req, res, next) {
         return Cliente.update_cliente_info(req).then((respuerta) => {
             return res.send(respuerta);
         });
-    }*/
+    }
 }

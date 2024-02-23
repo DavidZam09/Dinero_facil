@@ -206,7 +206,6 @@ async function create_cliente_info( req ) {
 
     req.pipe(busboy);
 
-
     try {
         const cliente_info = await Cliente_info.create(obj);
         return lista_cliente_infoxcliente( cliente_info.id_cliente )
@@ -215,62 +214,91 @@ async function create_cliente_info( req ) {
     }
 }
 
-async function update_cliente_info(data) {
-    const Op = SQL.Op;
-    var user = await User.findOne({ where: { id: data.id } });
-    if (user === null) {
-        return { successful: false, error: "Usuario no existe" };
-    }
 
-    var validar1 = await User.findOne({ where: { num_celular: data.num_celular, id: { [Op.ne]: data.id } } });
-    if (validar1 !== null) {
-        return { successful: false, error: "Celular ya existe" };
-    }
+async function create_cliente_info( req ) {
 
-    var validar2 = await User.findOne({ where: { email: data.email, id: { [Op.ne]: data.id } } });
-    if (validar2 !== null) {
-        return { successful: false, error: "Correo ya existe" };
-    }
-
-    var validar3 = await User.findOne({ where: { num_doc: data.num_doc, id: { [Op.ne]: data.id } } });
-    if (validar3 !== null) {
-        return { successful: false, error: "Numero de documento ya existe" };
-    }
-
+    const busboy = Busboy({ headers: req.headers });
+    var data = req.body;
     var obj = {
         id: data.id,
+        id_cliente: data.id_cliente,
+        id_dpto: data.id_dpto,
+        id_ciudad: data.id_ciudad,
         id_user_tipo_doc: data.id_user_tipo_doc,
-        id_user_rol: data.id_user_rol,
-        nombre_completo: data.nombre_completo,
-        email: data.email,
-        num_celular: data.num_celular,
-        num_doc: data.num_doc,
+        id_cliente_actividad_eco: data.id_cliente_actividad_eco,
+        id_cliente_sector_eco: data.id_cliente_sector_eco,
+        nombres_cliente: data.nombres_cliente,
+        apellidos_cliente: data.apellidos_cliente,
+        fecha_nac: data.fecha_nac,
         direccion: data.direccion,
-        activo: data.activo
+        num_documento: data.num_documento,
+        otro_sector_y_actividad: data.otro_sector_y_actividad,
+        nombre_empresa_labora: data.nombre_empresa_labora,
+        ingreso_mesual: data.ingreso_mesual,
+        gasto_mensual: data.gasto_mensual,
+        foto_cliente: '',
+        foto_doc_frontal: '',
+        foto_doc_trasera: '',
+        foto_recivo_publico: '',
+        foto_pago_nomina: '',
+        tratamiento_datos: data.tratamiento_datos,
+        terminos_y_condiciones: data.terminos_y_condiciones,
+        rf1_nombre_completo: data.rf1_nombre_completo,
+        rf1_num_celular: data.rf1_num_celular,
+        rf1_direccion: data.rf1_direccion,
+        rf2_nombre_completo: data.rf2_nombre_completo,
+        rf2_num_celular: data.rf2_num_celular,
+        rf2_direccion: data.rf2_direccion
     };
 
-    if ((data.password === '') || (data.password === null)) { } else {
-        const salt = await bcrypt.genSalt(process.env.SAL_ROUND);
-        obj.password = await bcrypt.hash(data.password, salt);
+    var uploadDir = '';
+    try {
+        //genera carpeta
+        var  id = await Cliente_info.max('id');
+        var dir = '../../uploads/' + id;    
+        uploadDir = path.join(__dirname, dir);
+    
+        if (!fs.existsSync(uploadDir)) {
+            fs.mkdirSync(uploadDir, { recursive: true });
+        }
+    } catch (error) {
+        return ({ successful: false, data: "Ocurrio un error al intentar crear la carpeta de los archivos" });
     }
+
+    busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+        var ext = filename.filename.split('.')[1];
+        const nombreArchivo = `${fieldname}.${ext}`;
+        filePath = `./uploads/${id}/${nombreArchivo}`;
+        file.pipe(fs.createWriteStream(filePath));
+        console,log(fieldname);
+
+        switch (fieldname) {
+            case "foto_cliente":
+                obj.foto_cliente = filePath;
+                break;
+            case "foto_doc_frontal":
+                obj.foto_doc_frontal = filePath;
+                break;
+            case "foto_doc_trasera":
+                obj.foto_doc_trasera = filePath;
+                break;
+            case "foto_recivo_publico":
+                obj.foto_recivo_publico = filePath;
+                break;
+            case "foto_pago_nomina":
+                obj.foto_pago_nomina = filePath;
+                break;
+            default: null;
+                break;
+        }
+    });
+
+    req.pipe(busboy);
 
     try {
-        user.update(obj);
-        return lista_users(data.id);
+        const cliente_info = await Cliente_info.create(obj);
+        return lista_cliente_infoxcliente( cliente_info.id_cliente )
     } catch (error) {
-        console.log(error);
-        return { successful: false, error: error };
+        return({ successful: false, data: error });
     }
 }
-
-    //try {
-    //req.pipe(busboy);
-    /*} catch (error) {
-        //borro archivos
-        const archivos = fs.readdirSync(uploadDir);
-        archivos.forEach(archivo => {
-            const rutaArchivo = path.join(uploadDir, archivo);
-            fs.unlinkSync(rutaArchivo);
-        });
-        return({ successful: false, data: "Ocurrio un error al intentar subir los archivos" });
-    }*/
