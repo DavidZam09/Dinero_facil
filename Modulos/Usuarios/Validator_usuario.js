@@ -41,12 +41,12 @@ const login_user = [
 
 const input_user = [
    body('id').optional({ nullable: true, checkFalsy: true }).trim().isInt().withMessage('Solo valores enteros'),
-   body('nombre_completo').notEmpty().withMessage('Solo valores de cadena'),
+   body('nombre_completo').notEmpty().withMessage('variable no existe o es nula'),
    body('email').isEmail().withMessage('Solo se admite Correo'),
-   body('num_celular').notEmpty().withMessage('variable no existe'),
-   body('num_doc').notEmpty().withMessage('variable no existe'),   
+   body('num_celular').notEmpty().withMessage('variable no existe o es nula'),
+   body('num_doc').notEmpty().withMessage('variable no existe o es nula'),   
    body('password').exists().withMessage('variable password no existe'),
-   body('direccion').notEmpty().withMessage('variable no existe'),
+   body('direccion').notEmpty().withMessage('variable no existe o es nula'),
    body('activo').isBoolean().withMessage('Solo valores booleanos'),
    body('id_user_rol', 'Invalido Rol').isInt().exists().custom(data => {
       return new Promise((resolve, reject) => {
