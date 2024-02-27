@@ -1,4 +1,4 @@
-const Cliente_info = require("./Modulos/Clientes/Model_clientes_info");
+const Cliente_info = require("../Modulos/Clientes/Model_clientes_info");
 const fs = require("fs");
 var path = require("path");
 const Busboy = require("busboy");

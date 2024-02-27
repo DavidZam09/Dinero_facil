@@ -1,4 +1,4 @@
-const sequelize = require('../../config_db');
+const sequelize = require('../../Helpers/Config_db');
 const { DataTypes } = require("sequelize");
 
 const Actividad_eco = sequelize.define("cliente_actividad_eco", {
