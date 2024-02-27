@@ -10,9 +10,11 @@ const Cliente = require("./Model_cliente");
 const Actividad_eco = require("./Model_clientes_actividad_eco");
 const Sector_eco = require("./Model_clientes_sector_eco");
 const Cliente_info = require("./Model_clientes_info");
+const Config = require("../Creditos/Model_config");
+const Email = require("../../Helpers/Email_config");
 
 const { v4: uuidv4 } = require("uuid");
-const { log } = require("console");
+//const { log } = require("console");
 
 function generarCodigoUnico() {
   const uuid = uuidv4();
@@ -133,8 +135,20 @@ async function lista_cliente_infoxcliente(id) {
 
 async function input_cliente_info(req) {
   try {
-    var data = await Cliente_info.create(req.body);
-    return lista_cliente_infoxcliente(data.id_cliente);
+    const data = await Cliente_info.create(req.body);
+    const resp =  await lista_cliente_infoxcliente(data.id_cliente);
+
+    // envio de correo
+    const config = await Config.findAll();
+    const mailOptions = {
+        from: 'tu_correo@example.com',
+        to: 'correo_destino@example.com',
+        subject: 'Asunto del correo',
+        text: 'Contenido del correo'
+    };
+    const transporter = Email.createTransporter();
+    await sendMail(transporter, mailOptions);
+
   } catch (error) {
     return {
       successful: false,

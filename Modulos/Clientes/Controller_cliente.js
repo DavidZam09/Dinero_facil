@@ -111,6 +111,10 @@ async function input_cliente_info(req, res, next) {
             borrarContenidoCarpeta();
             return res.json({ successful: false, errors: "falta el documento: " + text });
         }
+        var val = await Cliente_info.findOne({ where: { id_cliente: parseInt(id) } });
+        if( val ){
+            return res.json({ successful: false, errors: "El cliente_info ya existe: " + val.id });
+        }
     }else{
         var val1 = await Cliente_info.findOne({ where: { id: req.body.id } });
         if (val1 === null){
