@@ -70,6 +70,7 @@ function lista_cliente_infoxcliente(req, res, next) {
     });
 }
 
+const Upload_files = require('../../Helpers/Upload_files');
 async function input_cliente_info(req, res, next) {
 
     //valido errores de data 
@@ -78,6 +79,9 @@ async function input_cliente_info(req, res, next) {
         borrarContenidoCarpeta();
         return res.json({ successful: false, errors: errors.array() });
     }
+
+    req = await Upload_files.files_save(req);
+    comsole.log(re.body);
 
     var array_name = [];
 
@@ -112,18 +116,18 @@ async function input_cliente_info(req, res, next) {
             borrarContenidoCarpeta();
             return res.json({ successful: false, errors: "falta el documento: " + text });
         }
-        var val = await Cliente_info.findOne({ where: { id_cliente: parseInt(req.body.id_cliente) } });
+        /*var val = await Cliente_info.findOne({ where: { id_cliente: parseInt(req.body.id_cliente) } });
         if( val ){
             return res.json({ successful: false, errors: "El cliente_info ya existe: " + val.id });
-        }
+        }*/
     }else{
-        var val1 = await Cliente_info.findOne({ where: { id: req.body.id } });
+        /*var val1 = await Cliente_info.findOne({ where: { id: req.body.id } });
         if (val1 === null){
             return res.json({ successful: false, errors: "El id del cliente_info no existe: " + req.body.id });
         }
         if (val2.id_cliente === req.body.id_cliente ){
             return res.json({ successful: false, errors: "la informacion del id_cliente y el id_cliente_info no coincide con lo encontrado en base de datos" });
-        }
+        }*/
         for (const fileField in array_name) {
             const indice = array.indexOf(fileField);
             if (indice !== -1) {

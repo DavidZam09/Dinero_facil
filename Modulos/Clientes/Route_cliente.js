@@ -16,6 +16,6 @@ app.get('/cliente_info/lista_actividad_eco', clientes.lista_actividad_eco);
 app.get('/cliente_info/lista_sector_eco', clientes.lista_sector_eco);
 app.get('/cliente_info/lista_cliente_infoxcliente', Val.lista_cliente_infoxcliente, clientes.lista_cliente_infoxcliente);
 
-app.post('/cliente_info/input_cliente_info', Upload_files.files_cliente_info, Val.input_cliente_info,  clientes.input_cliente_info);
+app.post('/cliente_info/input_cliente_info', Upload_files.files_body, Val.input_cliente_info, clientes.input_cliente_info);
 module.exports = app;
 
