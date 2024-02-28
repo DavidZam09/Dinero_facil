@@ -1,16 +1,24 @@
 const nodemailer = require("nodemailer");
-const Config = require("../Creditos/Model_config");
+const Config = require("../Modulos/Creditos/Model_config");
 
 // Configuración del transporte de correo
-function createTransporter() {
+async function createTransporter() {
+  
 // Configuración del servidor de correo
+const config = await Config.findAll();
+const correo_host = config[0].valor_variable;
+const correo_port = config[1].valor_variable;
+const correo_secure = config[2].valor_variable;
+const correo_auth_user = config[3].valor_variable;
+const correo_auth_pass = config[4].valor_variable;
+
 const smtpConfig = {
-    host: 'smtp.example.com',
-    port: 587,
-    secure: false, // true para SSL, false para TLS
+    host: correo_host,
+    port: correo_port,
+    secure: correo_secure?true:false, // true para SSL, false para TLS
     auth: {
-        user: 'tu_correo@example.com',
-        pass: 'tu_contraseña'
+        user: correo_auth_user,
+        pass: correo_auth_pass
     }
 };
 

@@ -3,7 +3,7 @@ const app = express();
 const Auth_cliente = require('./Auth_cliente');
 var clientes = require('./Controller_cliente');
 const Val  = require('./Validator_cliente');
-const Upload_files = require('../../Upload_files');
+const Upload_files = require('../../Helpers/Upload_files');
 
 //rutas clientes
 app.get('/clientes/lista_cliente_tipos', Auth_cliente, clientes.lista_cliente_tipos);

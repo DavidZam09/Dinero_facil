@@ -4,6 +4,43 @@ START TRANSACTION;
 SET time_zone = "-05:00";
 
 
+-- Volcando estructura para tabla dinero_facil.configs
+CREATE TABLE IF NOT EXISTS `configs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nom_variable` varchar(255) NOT NULL,
+  `valor_variable` text NOT NULL,
+  `detalle` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.configs: ~5 rows (aproximadamente)
+INSERT INTO `configs` (`id`, `nom_variable`, `valor_variable`, `detalle`, `createdAt`, `updatedAt`) VALUES
+	(1, 'correo_host', 'smtp.gmail.com', 'es le host de envio de correos', '2024-02-28 02:45:18', '2024-02-28 02:40:56'),
+	(2, 'correo_port', '587', 'el puerto que usa el envio de correo', '2024-02-28 02:46:27', '2024-02-28 02:41:33'),
+	(3, 'correo_secure', 'true', 'si posee seguridad ssl', '2024-02-28 02:46:35', '2024-02-28 02:42:03'),
+	(4, 'correo_auth_user', 'rubenx87@gmail.com', 'usuario del correo ', '2024-02-28 02:47:08', '2024-02-28 02:42:31'),
+	(5, 'correo_auth_pass', 'geob hemk czoj ypcd', 'pass del correo', '2024-02-28 03:15:37', '2024-02-28 02:42:41');
+
+-- Volcando estructura para tabla dinero_facil.config_mensajes
+CREATE TABLE IF NOT EXISTS `config_mensajes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nom_mensaje` varchar(255) NOT NULL,
+  `asunto_mensaje` varchar(255) DEFAULT NULL,
+  `mensaje` text NOT NULL,
+  `detalle` text DEFAULT NULL,
+  `tipo_mensaje` enum('Correo','Whatsapp') DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
+
+
+
 -- Volcando estructura de base de datos para dinero_facil
 CREATE DATABASE IF NOT EXISTS `dinero_facil` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 USE `dinero_facil`;

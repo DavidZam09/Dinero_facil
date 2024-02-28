@@ -98,11 +98,12 @@ async function input_cliente_info(req, res, next) {
         name_file = name_file.replace(regex, '');
         array_name.push(name_file);
     }
+    ///console.log(array);
 
     //comparo arrays para comparar y ver cual falta
     const array = ['foto_cliente', 'foto_doc_frontal', 'foto_doc_trasera', 'foto_recivo_publico', 'foto_pago_nomina'];
     if (req.body.id === "" || req.body.id === null){
-        const diferenciaTotal = array.concat(array_name);
+        const diferenciaTotal = array.filter(elemento => array_name.indexOf(elemento) == -1);
         if (diferenciaTotal.length !== 0) {
             var text = '';
             diferenciaTotal.forEach(ele => {
@@ -111,7 +112,7 @@ async function input_cliente_info(req, res, next) {
             borrarContenidoCarpeta();
             return res.json({ successful: false, errors: "falta el documento: " + text });
         }
-        var val = await Cliente_info.findOne({ where: { id_cliente: parseInt(id) } });
+        var val = await Cliente_info.findOne({ where: { id_cliente: parseInt(req.body.id_cliente) } });
         if( val ){
             return res.json({ successful: false, errors: "El cliente_info ya existe: " + val.id });
         }

@@ -127,32 +127,38 @@ async function lista_sector_eco() {
 }
 
 async function lista_cliente_infoxcliente(id) {
-  return {
-    successful: true,
-    data: await Cliente_info.findOne({ where: { id_cliente: parseInt(id) } }),
-  };
+  var select = `SELECT ci.*, cae.nombre_actividad_eco, cse.nombre_sector_eco, 
+  utd.nombre_tipo_doc, c.email, c.num_celular FROM cliente_infos AS ci 
+  INNER JOIN clientes AS c ON c.id = ci.id_cliente
+  INNER JOIN cliente_actividad_ecos AS cae ON cae.id = ci.id_cliente_actividad_eco 
+  INNER JOIN cliente_sector_ecos AS cse ON cse.id = ci.id_cliente_sector_eco 
+  INNER JOIN user_tipo_docs AS utd ON utd.id = ci.id_user_tipo_doc 
+  WHERE ci.id_cliente = ${where} LIMIT 1`;
+  var data = await Cliente_info.sequelize.query(select, { type: QueryTypes.SELECT });
+  return ({ successful: true, data: data });
 }
 
 async function input_cliente_info(req) {
+
+  var resp = null;
   try {
     const data = await Cliente_info.create(req.body);
-    const resp =  await lista_cliente_infoxcliente(data.id_cliente);
-
-    // envio de correo
-    const config = await Config.findAll();
-    const mailOptions = {
-        from: 'tu_correo@example.com',
-        to: 'correo_destino@example.com',
-        subject: 'Asunto del correo',
-        text: 'Contenido del correo'
-    };
-    const transporter = Email.createTransporter();
-    await sendMail(transporter, mailOptions);
-
+    resp =  await lista_cliente_infoxcliente(data.id_cliente);
   } catch (error) {
     return {
       successful: false,
       data: "Error Al intentar Guardar en base de datos",
     };
   }
+
+      // envio de correo
+      const mailOptions = {
+        from: 'rubenx87@example.com',
+        to: resp.data[0].email,
+        subject: 'Asunto del correo',
+        text: 'Contenido del correo'
+    };
+    const transporter = Email.createTransporter();
+    await sendMail(transporter, mailOptions);
+
 }

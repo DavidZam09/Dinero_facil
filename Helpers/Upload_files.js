@@ -16,18 +16,18 @@ async function files_cliente_info(req, res, next) {
 
     //genera carpeta
     var id = (await Cliente_info.max("id")) + 1;
-    var dir = "./uploads/" + id;
+    var dir = "../uploads/" + id;
     uploadDir = path.join(__dirname, dir);
 
     if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
     }
-  
     //guardo archivos y estructuro data
     busboy.on("file", (fieldname, file, filename, encoding, mimetype) => {
       var ext = filename.filename.split(".")[1];
       const nombreArchivo = `${fieldname}.${ext}`;
-      filePath = `./uploads/${id}/${nombreArchivo}`;
+      //filePath = `../uploads/${id}/${nombreArchivo}`;
+      filePath = `${uploadDir}/${nombreArchivo}`;
       file.pipe(fs.createWriteStream(filePath));
       req.body[fieldname] = filePath;
       req.files.push(filePath);
