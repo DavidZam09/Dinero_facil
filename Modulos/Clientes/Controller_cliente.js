@@ -2,7 +2,6 @@ const { validationResult } = require("express-validator");
 const fs = require("fs");
 var path = require("path");
 const Cliente = require("./Services_cliente");
-const Cliente_info = require("./Model_clientes_info");
 
 module.exports = {
     dptxciudades,
@@ -12,7 +11,7 @@ module.exports = {
     lista_actividad_eco,
     lista_sector_eco,
     lista_cliente_infoxcliente,
-    input_cliente_info,
+    input_cliente_info
 };
 
 function dptxciudades(req, res, next) {
@@ -70,18 +69,14 @@ function lista_cliente_infoxcliente(req, res, next) {
     });
 }
 
-const Upload_files = require('../../Helpers/Upload_files');
 async function input_cliente_info(req, res, next) {
 
     //valido errores de data 
-    const errors = validationResult(req);
+    const errors = await validationResult(req);
     if (!errors.isEmpty()) {
-        borrarContenidoCarpeta();
+        borrarContenidoCarpeta(req.files);
         return res.json({ successful: false, errors: errors.array() });
     }
-
-    req = await Upload_files.files_save(req);
-    comsole.log(re.body);
 
     var array_name = [];
 
@@ -91,94 +86,45 @@ async function input_cliente_info(req, res, next) {
         const file = req.files[fileField];
         const fileType = path.extname(file).toLowerCase();
         if (fileType !== '.pdf' && !['.jpg', '.jpeg', '.png', '.gif'].includes(fileType)) {
-            borrarContenidoCarpeta();
-            //return res.status(400).json({ error: 'Los archivos deben ser imágenes (jpg, jpeg, png, gif) o PDF' });
+            borrarContenidoCarpeta(req.files);
             return res.json({ successful: false, errors: 'Los archivos deben ser imágenes (jpg, jpeg, png, gif) o PDF' });
         }
 
-        //armo array de documentos para comparar
+        //armo array de documentos subidos para comparar
         var name_file = path.basename(file);
         const regex = new RegExp(fileType, 'g');
         name_file = name_file.replace(regex, '');
         array_name.push(name_file);
     }
-    ///console.log(array);
 
-    //comparo arrays para comparar y ver cual falta
+    //comparo arrays el de referencia y el de archivos subidos
     const array = ['foto_cliente', 'foto_doc_frontal', 'foto_doc_trasera', 'foto_recivo_publico', 'foto_pago_nomina'];
-    if (req.body.id === "" || req.body.id === null){
+    if (req.body.id === "" || req.body.id === null) {
         const diferenciaTotal = array.filter(elemento => array_name.indexOf(elemento) == -1);
         if (diferenciaTotal.length !== 0) {
             var text = '';
             diferenciaTotal.forEach(ele => {
                 text = ele + ', ';
             });
-            borrarContenidoCarpeta();
+            borrarContenidoCarpeta(req.files);
             return res.json({ successful: false, errors: "falta el documento: " + text });
-        }
-        /*var val = await Cliente_info.findOne({ where: { id_cliente: parseInt(req.body.id_cliente) } });
-        if( val ){
-            return res.json({ successful: false, errors: "El cliente_info ya existe: " + val.id });
-        }*/
-    }else{
-        /*var val1 = await Cliente_info.findOne({ where: { id: req.body.id } });
-        if (val1 === null){
-            return res.json({ successful: false, errors: "El id del cliente_info no existe: " + req.body.id });
-        }
-        if (val2.id_cliente === req.body.id_cliente ){
-            return res.json({ successful: false, errors: "la informacion del id_cliente y el id_cliente_info no coincide con lo encontrado en base de datos" });
-        }*/
-        for (const fileField in array_name) {
-            const indice = array.indexOf(fileField);
-            if (indice !== -1) {
-                borrarContenidoCarpeta();
-                return res.json({ successful: false, errors: "falta el documento: " + fileField });
-            }
         }
     }
 
-    return Cliente.input_cliente_info(req).then((respuerta) => {
+    return Cliente.input_cliente_info( req.body, array_name, req.files ).then((respuerta) => {
         return res.send(respuerta);
     });
 }
 
-async function borrarContenidoCarpeta() {
-    var id = (await Cliente_info.max("id")) + 1;
-    var dir = "../../uploads/" + id;
-    carpeta = path.join(__dirname, dir);
-
-    // Lee el contenido de la carpeta
-    fs.readdir(carpeta, (err, archivos) => {
-        if (err) {
-            console.error('Error al leer la carpeta:', err);
-            return;
-        }
-
-        // Itera sobre los archivos y borra cada uno
-        for (const archivo of archivos) {
-            const rutaArchivo = path.join(carpeta, archivo);
-
-            // Verifica si el archivo es una carpeta
-            fs.stat(rutaArchivo, (err, stats) => {
-                if (err) {
-                    console.error('Error al obtener la información del archivo:', err);
-                    return;
-                }
-
-                if (stats.isDirectory()) {
-                    // Si es una carpeta, llamamos recursivamente a la función para borrar su contenido
-                    borrarContenidoCarpeta(rutaArchivo);
-                } else {
-                    // Si es un archivo, lo borramos
-                    fs.unlink(rutaArchivo, err => {
-                        if (err) {
-                            console.error('Error al borrar el archivo:', err);
-                            return;
-                        }
-                        console.log(`Archivo eliminado: ${rutaArchivo}`);
-                    });
-                }
-            });
-        }
-    });
+async function borrarContenidoCarpeta(array) {
+    // Itera sobre los archivos y borra cada uno
+    for (const archivo of array) {
+        fs.unlink(archivo, err => {
+            if (err) {
+                console.error('Error al borrar el archivo:', err);
+                return;
+            }
+            console.log(`Archivo eliminado: ${archivo}`);
+        });
+    }
 }

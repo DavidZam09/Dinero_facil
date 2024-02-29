@@ -2,6 +2,8 @@ const { QueryTypes } = require("sequelize");
 const SQL = require("sequelize");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const fs = require("fs");
+var path = require("path");
 
 
 const Clientes_tipo = require("./Model_clientes_tipo");
@@ -14,7 +16,6 @@ const Config = require("../Creditos/Model_config");
 const Email = require("../../Helpers/Email_config");
 
 const { v4: uuidv4 } = require("uuid");
-//const { log } = require("console");
 
 function generarCodigoUnico() {
   const uuid = uuidv4();
@@ -133,32 +134,45 @@ async function lista_cliente_infoxcliente(id) {
   INNER JOIN cliente_actividad_ecos AS cae ON cae.id = ci.id_cliente_actividad_eco 
   INNER JOIN cliente_sector_ecos AS cse ON cse.id = ci.id_cliente_sector_eco 
   INNER JOIN user_tipo_docs AS utd ON utd.id = ci.id_user_tipo_doc 
-  WHERE ci.id_cliente = ${where} LIMIT 1`;
+  WHERE ci.id_cliente = ${id} LIMIT 1`;
   var data = await Cliente_info.sequelize.query(select, { type: QueryTypes.SELECT });
   return ({ successful: true, data: data });
 }
 
-async function input_cliente_info(req) {
+async function input_cliente_info(datos, array_names, array_files) {
 
-  var resp = null;
+  var resp = '';
+  var data = '';
+  //creo la nueva carpeta donde van a estar los documentos 
+  const dir = `../../uploads/doc/${datos.id_cliente}/`;
+  const uploadDir = path.join(__dirname, dir);
+  if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+  }
+
   try {
-    const data = await Cliente_info.create(req.body);
-    resp =  await lista_cliente_infoxcliente(data.id_cliente);
+    if (datos.id === "" || datos.id === null){
+      data = await Cliente_info.create(datos);
+    }else{
+      data = await Cliente_info.findOne({ where: { id: datos.id } });
+      data.update(datos);
+    }
   } catch (error) {
     return {
       successful: false,
       data: "Error Al intentar Guardar en base de datos",
     };
   }
-
-      // envio de correo
-      const mailOptions = {
-        from: 'rubenx87@example.com',
-        to: resp.data[0].email,
-        subject: 'Asunto del correo',
-        text: 'Contenido del correo'
-    };
-    const transporter = Email.createTransporter();
-    await sendMail(transporter, mailOptions);
+  
+  resp = await lista_cliente_infoxcliente(data.id_cliente);
+  // envio de correo
+  const mailOptions = {
+    from: 'rubenx87@example.com',
+    to: resp.data[0].email,
+    subject: 'Asunto del correo',
+    text: 'Contenido del correo'
+  };
+  const transporter = await Email.createTransporter();
+  await Email.sendMail(transporter, mailOptions);
 
 }

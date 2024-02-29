@@ -101,18 +101,19 @@ const input_cliente_info = [
    body("id_cliente", "Invalido Cliente")
       .isInt()
       .exists()
-      .custom(async (data) => {
-         if ( ( req.body.id ==='' ) || (req.body.id ===null)){
-            const cliente = await Cliente.findOne({ where: { id: data } })
-            if (cliente === null) {
-               reject(new Error("Cliente no existe."));
-            } else {
+      .custom(async (data, { req }) => {
+         return new Promise(async (resolve, reject) => {
+         if ( ( req.body.id ==='' ) || (req.body.id === null)){
+            const cliente_info = await Cliente_info.findOne({ where: { id_cliente: data } })
+            if( ( cliente_info === '' ) || ( cliente_info === null )){
                resolve(true);
+            }else{
+               reject(new Error("Cliente_info ya existe."));
             }
          }else{
             const cliente = await Cliente_info.findOne({ where: { id_cliente: data, id: req.body.id } })
             if (cliente === null) {
-               reject(new Error("Cliente_info no existe."));
+               reject(new Error("Cliente_info no existe o es erroneo."));
             } else {
                resolve(true);
             }
@@ -126,6 +127,7 @@ const input_cliente_info = [
                }
             });
          });*/
+      });
       }),
    body("id_cliente_actividad_eco", "Invalido Actividad Economica")
       .isInt()
