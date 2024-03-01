@@ -80,7 +80,6 @@ const lista_cliente_infoxcliente = [
 ];
 
 const input_cliente_info = [
-   //body('id').optional({ nullable: true, checkFalsy: true }).trim().isInt().withMessage('Solo valores enteros'),
    body('id', "Invalido Cliente_info")
    .exists()
    .custom((data) => {
@@ -118,15 +117,6 @@ const input_cliente_info = [
                resolve(true);
             }
          }
-         /*return new Promise((resolve, reject) => {
-            Cliente.findOne({ where: { id: data } }).then((Exist) => {
-               if (Exist === null) {
-                  reject(new Error("Cliente no existe."));
-               } else {
-                  resolve(true);
-               }
-            });
-         });*/
       });
       }),
    body("id_cliente_actividad_eco", "Invalido Actividad Economica")
