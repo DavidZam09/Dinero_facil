@@ -1,9 +1,10 @@
 const { body, check } = require("express-validator");
-const Cliente = require("./Model_cliente");
+
 const Cliente_info = require("./Model_clientes_info");
 const Cliente_act_eco = require("./Model_clientes_actividad_eco");
 const Cliente_sec_eco = require("./Model_clientes_sector_eco");
 const Tipo_doc = require("../Usuarios/Model_tipo_doc");
+const Cliente = require('./Model_cliente');
 
 const registrar_cliente = [
    check("cod_referido").exists().withMessage("La variable Password no existe"),

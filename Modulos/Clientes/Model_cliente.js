@@ -46,7 +46,7 @@ const Cliente = sequelize.define("cliente", {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
-    },
+    }
 });
 
 module.exports = Cliente;

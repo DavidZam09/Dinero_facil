@@ -2,11 +2,13 @@ const sequelize = require('../../Helpers/Config_db');
 const { DataTypes } = require("sequelize");
 const Credito_bancos = require('./Model_credito_bancos');
 const Credito_estados = require('./Model_credito_estados');
+const Usuario = require('../Usuarios/Model_usuario');
+const Cliente = require('../Clientes/Model_cliente');
 
 const Tipo_doc = sequelize.define("credito", {
   id_credito_estados: {
     type: DataTypes.STRING,
-    allowNull: true,
+    allowNull: false,
         references: {
         model: Credito_estados,
         key: 'id'
@@ -20,11 +22,31 @@ const Tipo_doc = sequelize.define("credito", {
         key: 'id'
     }
   }, 
+  id_usuario_aprueba: {
+    type: DataTypes.STRING,
+    allowNull: false,
+      references: {
+        model: Usuario,
+        key: 'id'
+    }
+  }, 
+  id_cliente: {
+    type: DataTypes.STRING,
+    allowNull: false,
+      references: {
+        model: Cliente,
+        key: 'id'
+    }
+  }, 
   valor_credito: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
   entrega_en_efectivo: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  tipo_cobro: {
     type: DataTypes.STRING,
     allowNull: false
   },
@@ -35,6 +57,14 @@ const Tipo_doc = sequelize.define("credito", {
   tipo_cuenta: {
     type: DataTypes.STRING,
     allowNull: true
+  },
+  periodicidad_cobro: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  num_cuotas: {
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   fec_desembolso: {
     type: DataTypes.DATE,

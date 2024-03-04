@@ -3,6 +3,27 @@ SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
 SET time_zone = "-05:00";
 
+-- Volcando estructura para tabla dinero_facil.creditos
+CREATE TABLE IF NOT EXISTS `creditos` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_credito_estado` bigint(20) unsigned NOT NULL,
+  `id_banco` bigint(20) unsigned DEFAULT NULL,
+  `id_usuario_aprueba` bigint(20) unsigned NOT NULL,
+  `id_cliente` bigint(20) unsigned NOT NULL,
+  `valor_credito` bigint(20) unsigned NOT NULL,
+  `entrega_en_efectivo` varchar(2) NOT NULL,
+  `tipo_cobro` varchar(20) NOT NULL,
+  `num_cuenta` varchar(20) DEFAULT NULL,
+  `tipo_cuenta` varchar(20) DEFAULT NULL,
+  `periodicidad_cobro` varchar(20) NOT NULL,
+  `num_cuotas` bigint(20) unsigned NOT NULL,
+  `fec_desembolso` date DEFAULT NULL,
+  `fec_pazysalvo` date DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 
 -- Volcando estructura para tabla dinero_facil.configs
 CREATE TABLE IF NOT EXISTS `configs` (
