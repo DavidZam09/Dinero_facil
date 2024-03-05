@@ -20,11 +20,12 @@ function lista_credito_estados(req, res, next) {
 }
 
 function input_credito(req, res, next) {
-    const errors = validationResult(req);
+    const errors =  validationResult(req);
     if (!errors.isEmpty()) {
         return res.json({ successful: false, errors: errors.array() });
     }
-    Creditos.input_credito(req.query).then((respuerta) => {
+    
+    Creditos.input_credito(req.body).then((respuerta) => {
         return res.send(respuerta);
     });
 }

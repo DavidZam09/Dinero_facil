@@ -1,70 +1,47 @@
+-- --------------------------------------------------------
+-- Host:                         127.0.0.1
+-- Versión del servidor:         10.4.32-MariaDB - mariadb.org binary distribution
+-- SO del servidor:              Win64
+-- HeidiSQL Versión:             12.6.0.6765
+-- --------------------------------------------------------
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "-05:00";
-
--- Volcando estructura para tabla dinero_facil.creditos
-CREATE TABLE IF NOT EXISTS `creditos` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `id_credito_estado` bigint(20) unsigned NOT NULL,
-  `id_banco` bigint(20) unsigned DEFAULT NULL,
-  `id_usuario_aprueba` bigint(20) unsigned NOT NULL,
-  `id_cliente` bigint(20) unsigned NOT NULL,
-  `valor_credito` bigint(20) unsigned NOT NULL,
-  `entrega_en_efectivo` varchar(2) NOT NULL,
-  `tipo_cobro` varchar(20) NOT NULL,
-  `num_cuenta` varchar(20) DEFAULT NULL,
-  `tipo_cuenta` varchar(20) DEFAULT NULL,
-  `periodicidad_cobro` varchar(20) NOT NULL,
-  `num_cuotas` bigint(20) unsigned NOT NULL,
-  `fec_desembolso` date DEFAULT NULL,
-  `fec_pazysalvo` date DEFAULT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
--- Volcando estructura para tabla dinero_facil.configs
-CREATE TABLE IF NOT EXISTS `configs` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `nom_variable` varchar(255) NOT NULL,
-  `valor_variable` text NOT NULL,
-  `detalle` text DEFAULT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- Volcando datos para la tabla dinero_facil.configs: ~5 rows (aproximadamente)
-INSERT INTO `configs` (`id`, `nom_variable`, `valor_variable`, `detalle`, `createdAt`, `updatedAt`) VALUES
-	(1, 'correo_host', 'smtp.gmail.com', 'es le host de envio de correos', '2024-02-28 02:45:18', '2024-02-28 02:40:56'),
-	(2, 'correo_port', '587', 'el puerto que usa el envio de correo', '2024-02-28 02:46:27', '2024-02-28 02:41:33'),
-	(3, 'correo_secure', 'true', 'si posee seguridad ssl', '2024-02-28 02:46:35', '2024-02-28 02:42:03'),
-	(4, 'correo_auth_user', 'rubenx87@gmail.com', 'usuario del correo ', '2024-02-28 02:47:08', '2024-02-28 02:42:31'),
-	(5, 'correo_auth_pass', 'geob hemk czoj ypcd', 'pass del correo', '2024-02-28 03:15:37', '2024-02-28 02:42:41');
-
--- Volcando estructura para tabla dinero_facil.config_mensajes
-CREATE TABLE IF NOT EXISTS `config_mensajes` (
-  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-  `nom_mensaje` varchar(255) NOT NULL,
-  `asunto_mensaje` varchar(255) DEFAULT NULL,
-  `mensaje` text NOT NULL,
-  `detalle` text DEFAULT NULL,
-  `tipo_mensaje` enum('Correo','Whatsapp') DEFAULT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
-
-
-
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8 */;
+/*!50503 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
 -- Volcando estructura de base de datos para dinero_facil
 CREATE DATABASE IF NOT EXISTS `dinero_facil` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
 USE `dinero_facil`;
+
+-- Volcando estructura para tabla dinero_facil.clientes
+CREATE TABLE IF NOT EXISTS `clientes` (
+  `id` bigint(20) unsigned NOT NULL,
+  `id_cliente_tipo` bigint(20) unsigned NOT NULL,
+  `id_usuario` bigint(20) unsigned NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `num_celular` bigint(20) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `cod_referido` varchar(20) DEFAULT NULL,
+  `cod_personal` varchar(20) NOT NULL,
+  `fecha_aprobacion` date DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `cod_personal` (`cod_personal`),
+  UNIQUE KEY `num_celular` (`num_celular`),
+  KEY `FK1_id_cliente_tipo` (`id_cliente_tipo`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.clientes: ~1 rows (aproximadamente)
+INSERT INTO `clientes` (`id`, `id_cliente_tipo`, `id_usuario`, `email`, `num_celular`, `password`, `cod_referido`, `cod_personal`, `fecha_aprobacion`, `createdAt`, `updatedAt`) VALUES
+	(1, 1, 0, 'test001@gmail.com', 0, '$2b$10$Mmym6f49uFclPsvapOPDlOPqzVJKNky/oJnmi9Xnezbs9Cdyn.AgC', '', '972b924adc', NULL, '2024-02-07 02:44:51', '2024-02-07 02:44:51');
 
 -- Volcando estructura para tabla dinero_facil.cliente_actividad_ecos
 CREATE TABLE IF NOT EXISTS `cliente_actividad_ecos` (
@@ -77,30 +54,30 @@ CREATE TABLE IF NOT EXISTS `cliente_actividad_ecos` (
 
 -- Volcando datos para la tabla dinero_facil.cliente_actividad_ecos: ~22 rows (aproximadamente)
 INSERT INTO `cliente_actividad_ecos` (`id`, `nombre_actividad_eco`, `createdAt`, `updatedAt`) VALUES
-	(1, 'Almacén / Logística / Transporte', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(2, 'Administración / Oficina', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(3, 'Ventas', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(4, 'Contabilidad / Finanzas', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(5, 'Producción / Operarios / Manufactura', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(6, 'CallCenter / Telemercadeo', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(7, 'Medicina / Salud', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(8, 'Atención a clientes', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(9, 'Servicios Generales, Aseo y Seguridad', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(10, 'Mantenimiento y Reparaciones Técnicas', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(11, 'Hostelería / Turismo', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(12, 'Construcción y obra', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(13, 'Recursos Humanos', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(14, 'Informática / Telecomunicaciones', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(15, 'Compras / Comercio Exterior', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(16, 'Investigación y Calidad', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(17, 'Mercadotecnia / Publicidad / Comunicación', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(18, 'Ingeniería', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(19, 'Legal / Asesoría', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(20, 'Docencia', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(21, 'Dirección / Gerencia', '2024-02-08 03:47:52', '2024-02-08 03:47:52'),
-	(22, 'Otros', '2024-02-08 03:47:52', '2024-02-08 03:47:52');
+	(1, 'Almacén / Logística / Transporte', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(2, 'Administración / Oficina', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(3, 'Ventas', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(4, 'Contabilidad / Finanzas', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(5, 'Producción / Operarios / Manufactura', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(6, 'CallCenter / Telemercadeo', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(7, 'Medicina / Salud', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(8, 'Atención a clientes', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(9, 'Servicios Generales, Aseo y Seguridad', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(10, 'Mantenimiento y Reparaciones Técnicas', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(11, 'Hostelería / Turismo', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(12, 'Construcción y obra', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(13, 'Recursos Humanos', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(14, 'Informática / Telecomunicaciones', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(15, 'Compras / Comercio Exterior', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(16, 'Investigación y Calidad', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(17, 'Mercadotecnia / Publicidad / Comunicación', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(18, 'Ingeniería', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(19, 'Legal / Asesoría', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(20, 'Docencia', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(21, 'Dirección / Gerencia', '2024-02-08 08:47:52', '2024-02-08 08:47:52'),
+	(22, 'Otros', '2024-02-08 08:47:52', '2024-02-08 08:47:52');
 
--- Volcando estructura para tabla dinero_facil.cliente_info
+-- Volcando estructura para tabla dinero_facil.cliente_infos
 CREATE TABLE IF NOT EXISTS `cliente_infos` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `id_cliente` bigint(20) NOT NULL,
@@ -120,6 +97,7 @@ CREATE TABLE IF NOT EXISTS `cliente_infos` (
   `nombre_empresa_labora` varchar(50) NOT NULL,
   `ingreso_mesual` bigint(20) NOT NULL,
   `gasto_mensual` bigint(20) NOT NULL,
+  `foto_cliente` varchar(100) NOT NULL,
   `foto_doc_frontal` varchar(100) NOT NULL,
   `foto_doc_trasera` varchar(100) NOT NULL,
   `foto_recivo_publico` varchar(100) DEFAULT NULL,
@@ -135,9 +113,11 @@ CREATE TABLE IF NOT EXISTS `cliente_infos` (
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla dinero_facil.cliente_info: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla dinero_facil.cliente_infos: ~1 rows (aproximadamente)
+INSERT INTO `cliente_infos` (`id`, `id_cliente`, `id_dpto`, `id_ciudad`, `id_user_tipo_doc`, `id_cliente_actividad_eco`, `id_cliente_sector_eco`, `id_usuario`, `nombres_cliente`, `apellidos_cliente`, `fecha_nac`, `fecha_aprobacion`, `direccion`, `num_documento`, `otro_sector_y_actividad`, `nombre_empresa_labora`, `ingreso_mesual`, `gasto_mensual`, `foto_cliente`, `foto_doc_frontal`, `foto_doc_trasera`, `foto_recivo_publico`, `foto_pago_nomina`, `tratamiento_datos`, `terminos_y_condiciones`, `rf1_nombre_completo`, `rf1_num_celular`, `rf1_direccion`, `rf2_nombre_completo`, `rf2_num_celular`, `rf2_direccion`, `createdAt`, `updatedAt`) VALUES
+	(2, 1, 1, 0, 1, 1, 1, NULL, 'ruben', 'castillo', '1987-02-22', NULL, 'calle test - test', '123456789', '', 'lae-edu', 100000, 500000, 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_cliente.jpg', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_doc_frontal.', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_doc_trasera.', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_recivo_publi', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_pago_nomina.', 1, 1, 'lina', '741852963', 'calle test - test 2', 'karen', '654987321', 'calle test - test3', '2024-03-05 05:01:25', '2024-03-05 05:01:25');
 
 -- Volcando estructura para tabla dinero_facil.cliente_sector_ecos
 CREATE TABLE IF NOT EXISTS `cliente_sector_ecos` (
@@ -150,70 +130,171 @@ CREATE TABLE IF NOT EXISTS `cliente_sector_ecos` (
 
 -- Volcando datos para la tabla dinero_facil.cliente_sector_ecos: ~14 rows (aproximadamente)
 INSERT INTO `cliente_sector_ecos` (`id`, `nombre_sector_eco`, `createdAt`, `updatedAt`) VALUES
-	(1, 'Explotación de minas y canteras', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(2, 'Actividades de apoyo a la gestión pública', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(3, 'Telecomunicaciones', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(4, 'Actividades profesionales y técnicas', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(5, 'Manufactura', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(6, 'Financieras y de seguros (excepto bancos, cooperat', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(7, 'Artes, entretenimiento y recreación', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(8, 'Agricultura y pesca', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(9, 'Banca', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(10, 'Suministro de electricidad, gas, y A/C', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(11, 'Distribución de agua y saneamiento Salud humana y ', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(12, 'Comercio', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(13, 'Transporte y almacenamiento', '2024-02-08 03:53:31', '2024-02-08 03:53:31'),
-	(14, 'Otro', '2024-02-08 03:53:31', '2024-02-08 03:53:31');
+	(1, 'Explotación de minas y canteras', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(2, 'Actividades de apoyo a la gestión pública', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(3, 'Telecomunicaciones', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(4, 'Actividades profesionales y técnicas', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(5, 'Manufactura', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(6, 'Financieras y de seguros (excepto bancos, cooperat', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(7, 'Artes, entretenimiento y recreación', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(8, 'Agricultura y pesca', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(9, 'Banca', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(10, 'Suministro de electricidad, gas, y A/C', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(11, 'Distribución de agua y saneamiento Salud humana y ', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(12, 'Comercio', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(13, 'Transporte y almacenamiento', '2024-02-08 08:53:31', '2024-02-08 08:53:31'),
+	(14, 'Otro', '2024-02-08 08:53:31', '2024-02-08 08:53:31');
 
-CREATE TABLE `clientes` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `id_cliente_tipo` bigint(20) UNSIGNED NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `num_celular` bigint(20) NOT NULL,
-  `password` varchar(100) NOT NULL,
-  `cod_referido` varchar(20) DEFAULT NULL,
-  `cod_personal` varchar(20) NOT NULL,
-  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Volcado de datos para la tabla `clientes`
---
-
-INSERT INTO `clientes` (`id`, `id_cliente_tipo`, `email`, `num_celular`, `password`, `cod_referido`, `cod_personal`, `createdAt`, `updatedAt`) VALUES
-(1, 1, 'test001@gmail.com', 0, '$2b$10$Mmym6f49uFclPsvapOPDlOPqzVJKNky/oJnmi9Xnezbs9Cdyn.AgC', '', '972b924adc', '2024-02-06 21:44:51', '2024-02-06 21:44:51');
-
--- --------------------------------------------------------
-
-CREATE TABLE `cliente_tipos` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+-- Volcando estructura para tabla dinero_facil.cliente_tipos
+CREATE TABLE IF NOT EXISTS `cliente_tipos` (
+  `id` bigint(20) unsigned NOT NULL,
   `nombre_tipo_cliente` varchar(20) NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `cliente_tipos`
---
-
+-- Volcando datos para la tabla dinero_facil.cliente_tipos: ~5 rows (aproximadamente)
 INSERT INTO `cliente_tipos` (`id`, `nombre_tipo_cliente`, `createdAt`, `updatedAt`) VALUES
-(1, 'Nuevo', '2024-02-06 19:19:00', '2024-02-06 19:19:00'),
-(2, 'En Estudio', '2024-02-06 19:19:20', '2024-02-06 19:19:20'),
-(3, 'Aprobado', '2024-02-06 19:19:38', '2024-02-06 19:19:38'),
-(4, 'No Apto', '2024-02-06 19:20:05', '2024-02-06 19:20:05'),
-(5, 'Incompleto', '2024-02-06 19:20:51', '2024-02-06 19:20:24');
+	(1, 'Nuevo', '2024-02-07 00:19:00', '2024-02-07 00:19:00'),
+	(2, 'En Estudio', '2024-02-07 00:19:20', '2024-02-07 00:19:20'),
+	(3, 'Aprobado', '2024-02-07 00:19:38', '2024-02-07 00:19:38'),
+	(4, 'No Apto', '2024-02-07 00:20:05', '2024-02-07 00:20:05'),
+	(5, 'Incompleto', '2024-02-07 00:20:51', '2024-02-07 00:20:24');
 
--- --------------------------------------------------------
+-- Volcando estructura para tabla dinero_facil.configs
+CREATE TABLE IF NOT EXISTS `configs` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nom_variable` varchar(255) NOT NULL,
+  `valor_variable` text NOT NULL,
+  `detalle` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Estructura de tabla para la tabla `users`
---
+-- Volcando datos para la tabla dinero_facil.configs: ~5 rows (aproximadamente)
+INSERT INTO `configs` (`id`, `nom_variable`, `valor_variable`, `detalle`, `createdAt`, `updatedAt`) VALUES
+	(1, 'correo_host', 'smtp.gmail.com', 'es le host de envio de correos', '2024-02-28 07:45:18', '2024-02-28 07:40:56'),
+	(2, 'correo_port', '465', 'el puerto que usa el envio de correo', '2024-03-05 05:02:09', '2024-02-28 07:41:33'),
+	(3, 'correo_secure', 'true', 'si posee seguridad ssl', '2024-02-28 07:46:35', '2024-02-28 07:42:03'),
+	(4, 'correo_auth_user', 'rubenx87@gmail.com', 'usuario del correo ', '2024-02-28 07:47:08', '2024-02-28 07:42:31'),
+	(5, 'correo_auth_pass', 'geob hemk czoj ypcd', 'pass del correo', '2024-02-28 08:15:37', '2024-02-28 07:42:41');
 
-CREATE TABLE `users` (
-  `id` bigint(20) UNSIGNED NOT NULL,
-  `id_user_tipo_doc` bigint(20) UNSIGNED NOT NULL,
-  `id_user_rol` bigint(20) UNSIGNED NOT NULL,
+-- Volcando estructura para tabla dinero_facil.config_mensajes
+CREATE TABLE IF NOT EXISTS `config_mensajes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nom_mensaje` varchar(255) NOT NULL,
+  `asunto_mensaje` varchar(255) DEFAULT NULL,
+  `mensaje` text NOT NULL,
+  `detalle` text DEFAULT NULL,
+  `tipo_mensaje` enum('Correo','Whatsapp') DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.config_mensajes: ~0 rows (aproximadamente)
+
+-- Volcando estructura para tabla dinero_facil.creditos
+CREATE TABLE IF NOT EXISTS `creditos` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_credito_estado` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `id_banco` bigint(20) unsigned DEFAULT NULL,
+  `id_usuario_asignado` bigint(20) unsigned DEFAULT NULL,
+  `id_cliente` bigint(20) unsigned NOT NULL,
+  `valor_credito` bigint(20) unsigned NOT NULL,
+  `entrega_en_efectivo` varchar(2) NOT NULL,
+  `tipo_cobro` varchar(20) NOT NULL,
+  `num_cuenta` varchar(20) DEFAULT NULL,
+  `tipo_cuenta` varchar(20) DEFAULT NULL,
+  `periodicidad_cobro` varchar(20) NOT NULL,
+  `num_cuotas` bigint(20) unsigned NOT NULL,
+  `fec_desembolso` date DEFAULT NULL,
+  `fec_pazysalvo` date DEFAULT NULL,
+  `nota_cliente` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.creditos: ~0 rows (aproximadamente)
+INSERT INTO `creditos` (`id`, `id_credito_estado`, `id_banco`, `id_usuario_asignado`, `id_cliente`, `valor_credito`, `entrega_en_efectivo`, `tipo_cobro`, `num_cuenta`, `tipo_cuenta`, `periodicidad_cobro`, `num_cuotas`, `fec_desembolso`, `fec_pazysalvo`, `nota_cliente`, `createdAt`, `updatedAt`) VALUES
+	(4, 1, NULL, NULL, 1, 2000, 'SI', 'Efectivo', NULL, NULL, 'Semanal', 5, NULL, NULL, '', '2024-03-05 05:09:47', '2024-03-05 05:09:47');
+
+-- Volcando estructura para tabla dinero_facil.credito_bancos
+CREATE TABLE IF NOT EXISTS `credito_bancos` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre_credito_bancos` varchar(100) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=41 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.credito_bancos: ~40 rows (aproximadamente)
+INSERT INTO `credito_bancos` (`id`, `nombre_credito_bancos`, `createdAt`, `updatedAt`) VALUES
+	(1, 'BANCOLOMBIA', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(2, 'BANCO AGRARIO', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(3, 'BANCO AV VILLAS', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(4, 'BANCO CAJA SOCIAL', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(5, 'BANCO COOPERATIVO COOPCENTRAL', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(6, 'BANCO CREDIFINANCIERA SA.', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(7, 'BANCO DAVIVIENDA', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(8, 'BANCO DE BOGOTÁ', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(9, 'BANCO DE LAS MICROFINANZAS BANCAMIA S.A.', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(10, 'BANCO DE OCCIDENTE', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(11, 'BANCO FALABELLA S.A.', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(12, 'BANCO FINANDINA S.A.', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(13, 'BANCO GNB COLOMBIA S.A', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(14, 'BANCO GNB SUDAMERIS', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(15, 'BANCO MUNDO MUJER', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(16, 'BANCO PICHINCHA', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(17, 'BANCO POPULAR', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(18, 'BANCO PROCREDIT', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(19, 'BANCO SANTANDER DE NEGOCIOS', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(20, 'BANCO SERFINANZA', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(21, 'BANCO W S.A', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(22, 'BANCOOMEVA', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(23, 'BANCÓLDEX S.A.', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(24, 'BBVA', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(25, 'BNP PARIBAS', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(26, 'CITIBANK', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(27, 'COLTEFINANCIERA S.A.', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(28, 'CONFIAR', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(29, 'COOFINEP COOPERATIVA FINANCIERA', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(30, 'COOPERATIVA FINANCIERA DE ANTIOQUIA', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(31, 'COTRAFA COOPERATIVA FINANCIERA', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(32, 'Daviplata', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(33, 'FINANCIERA JURISCOOP S.A. COMPAÑÍA DE FINANCIAMIENTO', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(34, 'GIROS Y FINANZAS COMPAÑÍA DE FINANCIAMIENTO S.A.', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(35, 'ITAÚ', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(36, 'ITAÚ antes CorpBanca', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(37, 'MIBANCO S.A.', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(38, 'NEQUI', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(39, 'Rappipay', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
+	(40, 'Scotiabank Colpatria S.A', '2024-03-05 02:32:37', '2024-03-05 02:32:37');
+
+-- Volcando estructura para tabla dinero_facil.credito_estados
+CREATE TABLE IF NOT EXISTS `credito_estados` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre_credito_tipo` varchar(50) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.credito_estados: ~5 rows (aproximadamente)
+INSERT INTO `credito_estados` (`id`, `nombre_credito_tipo`, `createdAt`, `updatedAt`) VALUES
+	(1, 'Solicitado', '2024-03-05 02:34:47', '2024-03-05 02:34:31'),
+	(2, 'Desembolsado', '2024-03-05 02:36:01', '2024-03-05 02:34:42'),
+	(3, 'Cancelado', '2024-03-05 02:34:58', '2024-03-05 02:34:58'),
+	(4, 'Paz&Salvo', '2024-03-05 02:35:40', '2024-03-05 02:35:40'),
+	(5, 'Incompleto', '2024-03-05 02:41:03', '2024-03-05 02:41:03');
+
+-- Volcando estructura para tabla dinero_facil.users
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` bigint(20) unsigned NOT NULL,
+  `id_user_tipo_doc` bigint(20) unsigned NOT NULL,
+  `id_user_rol` bigint(20) unsigned NOT NULL,
   `nombre_completo` varchar(100) NOT NULL,
   `password` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
@@ -225,181 +306,35 @@ CREATE TABLE `users` (
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `users`
---
-
+-- Volcando datos para la tabla dinero_facil.users: ~2 rows (aproximadamente)
 INSERT INTO `users` (`id`, `id_user_tipo_doc`, `id_user_rol`, `nombre_completo`, `password`, `email`, `num_celular`, `num_doc`, `direccion`, `activo`, `createdAt`, `updatedAt`) VALUES
-(1, 1, 1, 'Admin', 'Admin', 'admin@gmail.com', 1232465798, '123465789', 'callle 12#12-!2', 0, '2024-02-04 21:47:16', '2024-02-04 21:42:00'),
-(2, 1, 1, 'Admin test', '$2b$10$fR088Y26Fv.dDKH3ACABG.Z7kPDmPGXwAJ.SRPZoeDrcbmsV9Lizq', 'admin@gmail.comm', 12324657987, '1234657898', 'callle 12#12-!2', 1, '2024-02-06 15:25:03', '2024-02-06 15:25:03');
+	(1, 1, 1, 'Admin', 'Admin', 'admin@gmail.com', 1232465798, '123465789', 'callle 12#12-!2', 0, '2024-02-05 02:47:16', '2024-02-05 02:42:00'),
+	(2, 1, 1, 'Admin test', '$2b$10$fR088Y26Fv.dDKH3ACABG.Z7kPDmPGXwAJ.SRPZoeDrcbmsV9Lizq', 'admin@gmail.comm', 12324657987, '1234657898', 'callle 12#12-!2', 1, '2024-02-06 20:25:03', '2024-02-06 20:25:03');
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `user_rols`
---
-
-CREATE TABLE `user_rols` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+-- Volcando estructura para tabla dinero_facil.user_rols
+CREATE TABLE IF NOT EXISTS `user_rols` (
+  `id` bigint(20) unsigned NOT NULL,
   `nombre_rol` varchar(20) NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `user_rols`
---
-
+-- Volcando datos para la tabla dinero_facil.user_rols: ~2 rows (aproximadamente)
 INSERT INTO `user_rols` (`id`, `nombre_rol`, `createdAt`, `updatedAt`) VALUES
-(1, 'Admin', '2024-02-04 10:13:20', '2024-02-04 10:13:20'),
-(2, 'Colaborador', '2024-02-04 10:13:30', '2024-02-04 10:13:30');
+	(1, 'Admin', '2024-02-04 15:13:20', '2024-02-04 15:13:20'),
+	(2, 'Colaborador', '2024-02-04 15:13:30', '2024-02-04 15:13:30');
 
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `user_tipo_docs`
---
-
-CREATE TABLE `user_tipo_docs` (
-  `id` bigint(20) UNSIGNED NOT NULL,
+-- Volcando estructura para tabla dinero_facil.user_tipo_docs
+CREATE TABLE IF NOT EXISTS `user_tipo_docs` (
+  `id` bigint(20) unsigned NOT NULL,
   `nombre_tipo_doc` varchar(20) NOT NULL,
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Volcado de datos para la tabla `user_tipo_docs`
---
-
+-- Volcando datos para la tabla dinero_facil.user_tipo_docs: ~3 rows (aproximadamente)
 INSERT INTO `user_tipo_docs` (`id`, `nombre_tipo_doc`, `createdAt`, `updatedAt`) VALUES
-(1, 'C.C.', '2024-02-04 20:39:27', '2024-02-04 20:39:21'),
-(2, 'N.I.T', '2024-02-04 20:41:03', '2024-02-04 20:40:19'),
-(3, 'Pasaporte', '2024-02-04 20:41:01', '2024-02-04 20:40:48');
-
---
--- Índices para tablas volcadas
---
-
---
--- Indices de la tabla `clientes`
---
-ALTER TABLE `clientes`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `cod_personal` (`cod_personal`),
-  ADD UNIQUE KEY `num_celular` (`num_celular`),
-  ADD KEY `FK1_id_cliente_tipo` (`id_cliente_tipo`);
-
---
--- Indices de la tabla `cliente_actividad_eco`
---
-ALTER TABLE `cliente_actividad_eco`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `cliente_info`
---
-ALTER TABLE `cliente_info`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indices de la tabla `cliente_tipos`
---
-ALTER TABLE `cliente_tipos`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nombre_tipo_cliente` (`nombre_tipo_cliente`);
-
---
--- Indices de la tabla `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `email` (`email`),
-  ADD UNIQUE KEY `num_doc` (`num_doc`),
-  ADD UNIQUE KEY `num_celular` (`num_celular`),
-  ADD KEY `FK1_id_user_tipo_doc` (`id_user_tipo_doc`),
-  ADD KEY `FK1_id_user_rol` (`id_user_rol`);
-
---
--- Indices de la tabla `user_rols`
---
-ALTER TABLE `user_rols`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nombre_rol` (`nombre_rol`);
-
---
--- Indices de la tabla `user_tipo_docs`
---
-ALTER TABLE `user_tipo_docs`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `nombre_tipo_doc` (`nombre_tipo_doc`);
-
---
--- AUTO_INCREMENT de las tablas volcadas
---
-
---
--- AUTO_INCREMENT de la tabla `clientes`
---
-ALTER TABLE `clientes`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
-
---
--- AUTO_INCREMENT de la tabla `cliente_actividad_eco`
---
-ALTER TABLE `cliente_actividad_eco`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
-
---
--- AUTO_INCREMENT de la tabla `cliente_info`
---
-ALTER TABLE `cliente_info`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT de la tabla `cliente_tipos`
---
-ALTER TABLE `cliente_tipos`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT de la tabla `users`
---
-ALTER TABLE `users`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT de la tabla `user_rols`
---
-ALTER TABLE `user_rols`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
-
---
--- AUTO_INCREMENT de la tabla `user_tipo_docs`
---
-ALTER TABLE `user_tipo_docs`
-  MODIFY `id` bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- Restricciones para tablas volcadas
---
-
---
--- Filtros para la tabla `clientes`
---
-ALTER TABLE `clientes`
-  ADD CONSTRAINT `FK1_id_cliente_tipo` FOREIGN KEY (`id_cliente_tipo`) REFERENCES `cliente_tipos` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-
---
--- Filtros para la tabla `users`
---
-ALTER TABLE `users`
-  ADD CONSTRAINT `FK1_id_user_rol` FOREIGN KEY (`id_user_rol`) REFERENCES `user_rols` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  ADD CONSTRAINT `FK1_id_user_tipo_doc` FOREIGN KEY (`id_user_tipo_doc`) REFERENCES `user_tipo_docs` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
+	(1, 'C.C.', '2024-02-05 01:39:27', '2024-02-05 01:39:21'),
+	(2, 'N.I.T', '2024-02-05 01:41:03', '2024-02-05 01:40:19'),
+	(3, 'Pasaporte', '2024-02-05 01:41:01', '2024-02-05 01:40:48');
 

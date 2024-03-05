@@ -21,6 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', function(req, res, next) { res.render('index', { title: 'Express' }); });
 app.use(require('./Modulos/Usuarios/Route_usuario'));
 app.use(require('./Modulos/Clientes/Route_cliente'));
+app.use(require('./Modulos/Creditos/Route_creditos'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

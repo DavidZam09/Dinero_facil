@@ -25,53 +25,63 @@ const input_credito = [
          });
       }),
    body("id_credito_estado", "Invalido Estado Credito")
-      .isInt()
-      .exists()
-      .custom((data) => {
+      .exists().optional({ nullable: true })
+      .custom((data, { req }) => {
          return new Promise((resolve, reject) => {
-            Credito_estados.findOne({ where: { id: data } }).then((Exist) => {
-               if (Exist === null) {
-                  reject(new Error("Estado Credito no existe."));
-               } else {
-                  resolve(true);
-               }
-            });
+            if ((req.body.id === '') || (req.body.id === null)){
+               resolve(true);
+            }else{
+               Credito_estados.findOne({ where: { id: data } }).then((Exist) => {
+                  if (Exist === null) {
+                     reject(new Error("Estado Credito no existe."));
+                  } else {
+                     resolve(true);
+                  }
+               });
+            }
          });
       }),
    body("id_banco", "Invalido Banco")
       .isInt()
       .exists()
-      .custom((data) => {
+      .custom((data, { req }) => {
          return new Promise((resolve, reject) => {
-            Bancos.findOne({ where: { id: data } }).then((Exist) => {
-               if (Exist === null) {
-                  reject(new Error("Banco no existe."));
-               } else {
-                  resolve(true);
-               }
-            });
+            if ((req.body.id === '') || (req.body.id === null)){
+               resolve(true);
+            }else{
+               Bancos.findOne({ where: { id: data } }).then((Exist) => {
+                  if (Exist === null) {
+                     reject(new Error("Banco no existe."));
+                  } else {
+                     resolve(true);
+                  }
+               });
+            }
          });
       }),
    body("id_usuario_aprueba", "Invalido Usuario")
-      .isInt()
-      .exists()
-      .custom((data) => {
+      .exists().optional({ nullable: true })
+      .custom( (data, { req }) => {
          return new Promise((resolve, reject) => {
-            Usuarios.findOne({ where: { id: data } }).then((Exist) => {
-               if (Exist === null) {
-                  reject(new Error("Usuario no existe."));
-               } else {
-                  resolve(true);
-               }
-            });
+            if ((req.body.id === '') || (req.body.id === null)){
+               resolve(true);
+            }else{
+               Usuarios.findOne({ where: { id: data } }).then((Exist) => {
+                  if (Exist === null) {
+                     reject(new Error("Usuario no existe."));
+                  } else {
+                     resolve(true);
+                  }
+               });
+            }
          });
       }),
    body("id_cliente", "Invalido Cliente")
       .isInt()
       .exists()
       .custom((data) => {
-         return new Promise((resolve, reject) => {
-            Cliente.findOne({ where: { id: data } }).then((Exist) => {
+         return new Promise(async (resolve, reject) => {
+            await Cliente.findOne({ where: { id: data } }).then((Exist) => {
                if (Exist === null) {
                   reject(new Error("Cliente no existe."));
                } else {
@@ -97,11 +107,7 @@ const input_credito = [
                }
             }else{
                req.body.tipo_cuenta = '';
-               /*if(data){
-                  reject(new Error('Este campo debe estar vacio'))
-               }else{
-                  resolve(true)
-               }*/
+               resolve(true)
             }
          });
       }),
@@ -116,16 +122,15 @@ const input_credito = [
                   resolve(true)
                }
             }else{
-               req.body.num_cuenta = '';
                resolve(true)
             }
          });
       }),
    body('periodicidad_cobro').isIn(["Semanal","Quincenal"]).withMessage('Solo es permitido los valores "Semanal" y "Quincenal"'),
    body("num_cuotas").isInt().withMessage("Solo se admiten numero enteros"),
-   body('fec_desembolso').optional({ nullable: true }).isDate({ format: 'YYYY-MM-DD' }).withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
-   body('fec_pazysalvo').optional({ nullable: true }).isDate({ format: 'YYYY-MM-DD' }).withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
-
+   body("nota_cliente").exists().withMessage("No existe el campo nota_cliente"),
+   body('fec_desembolso').optional({ nullable: true, checkFalsy: true  }).isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
+   body('fec_pazysalvo').optional({ nullable: true, checkFalsy: true  }).isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
 ];
 
 

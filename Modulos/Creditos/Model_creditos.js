@@ -6,7 +6,7 @@ const Usuario = require('../Usuarios/Model_usuario');
 const Cliente = require('../Clientes/Model_cliente');
 
 const Tipo_doc = sequelize.define("credito", {
-  id_credito_estados: {
+  id_credito_estado: {
     type: DataTypes.STRING,
     allowNull: false,
         references: {
@@ -22,9 +22,9 @@ const Tipo_doc = sequelize.define("credito", {
         key: 'id'
     }
   }, 
-  id_usuario_aprueba: {
+  id_usuario_asignado: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
       references: {
         model: Usuario,
         key: 'id'
@@ -66,6 +66,10 @@ const Tipo_doc = sequelize.define("credito", {
     type: DataTypes.INTEGER,
     allowNull: false
   },
+  nota_cliente: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
   fec_desembolso: {
     type: DataTypes.DATE,
     allowNull: true
@@ -73,7 +77,8 @@ const Tipo_doc = sequelize.define("credito", {
   fec_pazysalvo: {
     type: DataTypes.DATE,
     allowNull: true
-  },
+  }
+  
 });
 
 module.exports = Tipo_doc;
