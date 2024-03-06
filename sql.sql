@@ -217,7 +217,7 @@ CREATE TABLE IF NOT EXISTS `creditos` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla dinero_facil.creditos: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla dinero_facil.creditos: ~1 rows (aproximadamente)
 INSERT INTO `creditos` (`id`, `id_credito_estado`, `id_banco`, `id_usuario_asignado`, `id_cliente`, `valor_credito`, `entrega_en_efectivo`, `tipo_cobro`, `num_cuenta`, `tipo_cuenta`, `periodicidad_cobro`, `num_cuotas`, `fec_desembolso`, `fec_pazysalvo`, `nota_cliente`, `createdAt`, `updatedAt`) VALUES
 	(4, 1, NULL, NULL, 1, 2000, 'SI', 'Efectivo', NULL, NULL, 'Semanal', 5, NULL, NULL, '', '2024-03-05 05:09:47', '2024-03-05 05:09:47');
 
@@ -272,6 +272,43 @@ INSERT INTO `credito_bancos` (`id`, `nombre_credito_bancos`, `createdAt`, `updat
 	(38, 'NEQUI', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
 	(39, 'Rappipay', '2024-03-05 02:32:37', '2024-03-05 02:32:37'),
 	(40, 'Scotiabank Colpatria S.A', '2024-03-05 02:32:37', '2024-03-05 02:32:37');
+
+-- Volcando estructura para tabla dinero_facil.credito_cotizacions
+CREATE TABLE IF NOT EXISTS `credito_cotizacions` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `valor_prestamo` bigint(20) NOT NULL,
+  `frecuencia_cobro` varchar(20) NOT NULL,
+  `interes` bigint(20) NOT NULL,
+  `interes_mora` bigint(20) NOT NULL,
+  `activo` varchar(2) NOT NULL DEFAULT 'SI',
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.credito_cotizacions: ~21 rows (aproximadamente)
+INSERT INTO `credito_cotizacions` (`id`, `valor_prestamo`, `frecuencia_cobro`, `interes`, `interes_mora`, `activo`, `createdAt`, `updatedAt`) VALUES
+	(1, 100000, 'Semanal', 15000, 8000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
+	(2, 200000, 'Semanal', 30000, 16000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
+	(3, 300000, 'Semanal', 45000, 24000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
+	(4, 400000, 'Semanal', 60000, 32000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
+	(5, 500000, 'Semanal', 75000, 40000, 'SI', '2024-03-06 03:52:26', '2024-03-06 00:09:43'),
+	(6, 600000, 'Semanal', 90000, 48000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
+	(7, 700000, 'Semanal', 105000, 56000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
+	(8, 800000, 'Semanal', 120000, 64000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
+	(9, 900000, 'Semanal', 135000, 72000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
+	(10, 1000000, 'Semanal', 150000, 80000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
+	(11, 100000, 'Quincenal', 23000, 13000, 'SI', '2024-03-06 00:15:08', '2024-03-06 00:15:08'),
+	(12, 200000, 'Quincenal', 57000, 28000, 'SI', '2024-03-06 00:15:08', '2024-03-06 00:15:08'),
+	(13, 300000, 'Quincenal', 87000, 39000, 'SI', '2024-03-06 00:15:08', '2024-03-06 00:15:08'),
+	(14, 400000, 'Quincenal', 117000, 52000, 'SI', '2024-03-06 00:15:08', '2024-03-06 00:15:08'),
+	(15, 500000, 'Quincenal', 147000, 65000, 'SI', '2024-03-06 00:15:08', '2024-03-06 00:15:08'),
+	(16, 600000, 'Quincenal', 170000, 78000, 'SI', '2024-03-06 00:15:08', '2024-03-06 00:15:08'),
+	(17, 700000, 'Quincenal', 192000, 91000, 'SI', '2024-03-06 00:15:08', '2024-03-06 00:15:08'),
+	(18, 800000, 'Quincenal', 223000, 104000, 'SI', '2024-03-06 00:15:08', '2024-03-06 00:15:08'),
+	(19, 900000, 'Quincenal', 240000, 117000, 'SI', '2024-03-06 00:15:08', '2024-03-06 00:15:08'),
+	(20, 1000000, 'Quincenal', 270000, 130000, 'SI', '2024-03-06 00:15:08', '2024-03-06 00:15:08'),
+	(21, 1000, 'Semanal', 100, 50, 'SI', '2024-03-06 04:28:59', '2024-03-06 04:28:59');
 
 -- Volcando estructura para tabla dinero_facil.credito_estados
 CREATE TABLE IF NOT EXISTS `credito_estados` (
@@ -338,3 +375,8 @@ INSERT INTO `user_tipo_docs` (`id`, `nombre_tipo_doc`, `createdAt`, `updatedAt`)
 	(2, 'N.I.T', '2024-02-05 01:41:03', '2024-02-05 01:40:19'),
 	(3, 'Pasaporte', '2024-02-05 01:41:01', '2024-02-05 01:40:48');
 
+/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;

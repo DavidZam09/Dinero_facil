@@ -7,7 +7,7 @@ const Cliente = require('../Clientes/Model_cliente');
 
 const Tipo_doc = sequelize.define("credito", {
   id_credito_estado: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false,
         references: {
         model: Credito_estados,
@@ -15,7 +15,7 @@ const Tipo_doc = sequelize.define("credito", {
     }
   }, 
    id_banco: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: true,
       references: {
         model: Credito_bancos,
@@ -23,7 +23,7 @@ const Tipo_doc = sequelize.define("credito", {
     }
   }, 
   id_usuario_asignado: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: true,
       references: {
         model: Usuario,
@@ -31,7 +31,7 @@ const Tipo_doc = sequelize.define("credito", {
     }
   }, 
   id_cliente: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false,
       references: {
         model: Cliente,

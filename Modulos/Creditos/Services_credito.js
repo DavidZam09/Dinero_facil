@@ -4,19 +4,23 @@ const SQL = require("sequelize");
 const Bancos = require("./Model_credito_bancos");
 const Credito_estados = require("./Model_credito_estados");
 const Creditos= require("./Model_creditos");
+const Creditos_cotizacion = require("./Model_credito_cotizacion");
 
 module.exports = {
   lista_bancos,
   lista_credito_estados,
   un_credito,
   input_credito,
-
+  lista_credito_cotizacion,
+  cotizacion_credito,
+  cotizacion_credito,
+  input_credito_cotizacion
 };
 
 /* servivios de Creditos */
 
 async function lista_bancos() {
-  return { successful: data. true, data: await Bancos.findAll() };
+  return { successful: true, data: await Bancos.findAll() };
 }
 
 async function lista_credito_estados() {
@@ -88,5 +92,74 @@ async function input_credito( datos ) {
   }
 
   await un_credito( data.id );
+}
 
+async function lista_credito_cotizacion() {
+  return { successful: true, data: await Creditos_cotizacion.findAll() };
+}
+
+async function cotizacion_credito( req ) {
+
+  const { num_cuotas, fecha_desembolso} = req;
+  const { valor_prestamo, frecuencia_cobro, interes, interes_mora} = await Creditos_cotizacion.findOne({ where: { id: req.id } });
+
+  const dias = frecuencia_cobro ==='Semanal'? 7 : 15;
+  var array_cuotas = [];
+  var total = null;
+  var fecha_carry = fecha_desembolso;
+
+  for (let index = 0; index < num_cuotas; index++) {
+    fecha_carry = new Date(fecha_carry);
+    fecha_carry = fecha_carry.setDate(fecha_carry.getDate() + dias);
+    fecha_carry = new Date(fecha_carry).toISOString();
+    fecha_carry = fecha_carry.split('T')[0];
+    const obj = {
+      n_cuota: index + 1,
+      cuota: valor_prestamo/num_cuotas,
+      interes: interes,
+      subtotal: valor_prestamo/num_cuotas + interes,
+      fecha_pago_cuota: fecha_carry
+    };
+    array_cuotas.push(obj);
+    total += valor_prestamo/num_cuotas + interes;
+  }
+  return { successful: true, data: {
+    valor_prestamo: valor_prestamo,
+    interes_mora: interes_mora,
+    interes: interes,
+    total_pagado: total,
+    num_cuotas: num_cuotas,
+    fecha_desembolso: fecha_desembolso,
+    frecuencia_cobro: frecuencia_cobro,
+    cuotas: array_cuotas
+  }};
+}
+
+
+async function input_credito_cotizacion( datos ) {
+
+  var obj = {
+    id: datos.id,
+    valor_prestamo : datos.valor_prestamo,
+    frecuencia_cobro: datos.frecuencia_cobro,
+    interes: datos.interes,
+    interes_mora: datos.interes_mora,
+    activo: datos.activo
+  }
+
+  var data = null;
+  try {
+    if (datos.id === "" || datos.id === null){
+      data = await Creditos_cotizacion.create(obj);
+    }else{
+      data = await Creditos_cotizacion.findOne({ where: { id: datos.id } });
+      data.update(obj);
+    }
+    return { successful: true, data: data };
+  } catch (error) {
+    return {
+      successful: false,
+      data: "Error Al intentar Guardar en base de datos",
+    };
+  }
 }
