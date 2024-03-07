@@ -5,6 +5,7 @@ const Bancos = require("./Model_credito_bancos");
 const Credito_estados = require("./Model_credito_estados");
 const Creditos= require("./Model_creditos");
 const Creditos_cotizacion = require("./Model_credito_cotizacion");
+const Credito_pago_estados = require("./Model_credito_pago_estados");
 
 module.exports = {
   lista_bancos,
@@ -14,7 +15,10 @@ module.exports = {
   lista_credito_cotizacion,
   cotizacion_credito,
   cotizacion_credito,
-  input_credito_cotizacion
+  input_credito_cotizacion,
+  lista_credito_estados_pago,
+  lista_credito_pago,
+  update_credito_pagoxcliente
 };
 
 /* servivios de Creditos */
@@ -162,4 +166,20 @@ async function input_credito_cotizacion( datos ) {
       data: "Error Al intentar Guardar en base de datos",
     };
   }
+}
+
+async function lista_credito_estados_pago() {
+  return { successful: true, data: await Credito_pago_estados.findAll() };
+}
+
+async function lista_credito_pago( id ) {
+  var select = `SELECT cpc.*, cpe.nombre_estado_pago FROM credito_pago_cuotas as cpc
+  INNER JOIN credito_pago_estados AS cpe ON cpe.id = cpc.id_credito_pago_estado
+  WHERE cpc.id_credito = ${id}`;
+  var data = await Creditos.sequelize.query(select, { type: QueryTypes.SELECT });
+  return ({ successful: true, data: data });
+}
+
+async function update_credito_pagoxcliente() {
+  return { successful: true, data: await Credito_pago_estados.findAll() };
 }

@@ -178,8 +178,13 @@ const input_credito_cotizacion = [
    body('activo').isIn(["SI","NO"]).withMessage('Solo es permitido los valores SI y NO'),
 ];
 
+const update_credito_pagoxcliente = [
+
+];
+
 module.exports = {
    input_credito,
    cotizacion_credito,
-   input_credito_cotizacion
+   input_credito_cotizacion,
+   update_credito_pagoxcliente
 };
