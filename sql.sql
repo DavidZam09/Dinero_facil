@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS `cliente_infos` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla dinero_facil.cliente_infos: ~1 rows (aproximadamente)
+-- Volcando datos para la tabla dinero_facil.cliente_infos: ~0 rows (aproximadamente)
 INSERT INTO `cliente_infos` (`id`, `id_cliente`, `id_dpto`, `id_ciudad`, `id_user_tipo_doc`, `id_cliente_actividad_eco`, `id_cliente_sector_eco`, `id_usuario`, `nombres_cliente`, `apellidos_cliente`, `fecha_nac`, `fecha_aprobacion`, `direccion`, `num_documento`, `otro_sector_y_actividad`, `nombre_empresa_labora`, `ingreso_mesual`, `gasto_mensual`, `foto_cliente`, `foto_doc_frontal`, `foto_doc_trasera`, `foto_recivo_publico`, `foto_pago_nomina`, `tratamiento_datos`, `terminos_y_condiciones`, `rf1_nombre_completo`, `rf1_num_celular`, `rf1_direccion`, `rf2_nombre_completo`, `rf2_num_celular`, `rf2_direccion`, `createdAt`, `updatedAt`) VALUES
 	(2, 1, 1, 0, 1, 1, 1, NULL, 'ruben', 'castillo', '1987-02-22', NULL, 'calle test - test', '123456789', '', 'lae-edu', 100000, 500000, 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_cliente.jpg', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_doc_frontal.', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_doc_trasera.', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_recivo_publi', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_pago_nomina.', 1, 1, 'lina', '741852963', 'calle test - test 2', 'karen', '654987321', 'calle test - test3', '2024-03-05 05:01:25', '2024-03-05 05:01:25');
 
@@ -217,7 +217,7 @@ CREATE TABLE IF NOT EXISTS `creditos` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla dinero_facil.creditos: ~1 rows (aproximadamente)
+-- Volcando datos para la tabla dinero_facil.creditos: ~0 rows (aproximadamente)
 INSERT INTO `creditos` (`id`, `id_credito_estado`, `id_banco`, `id_usuario_asignado`, `id_cliente`, `valor_credito`, `entrega_en_efectivo`, `tipo_cobro`, `num_cuenta`, `tipo_cuenta`, `periodicidad_cobro`, `num_cuotas`, `fec_desembolso`, `fec_pazysalvo`, `nota_cliente`, `createdAt`, `updatedAt`) VALUES
 	(4, 1, NULL, NULL, 1, 2000, 'SI', 'Efectivo', NULL, NULL, 'Semanal', 5, NULL, NULL, '', '2024-03-05 05:09:47', '2024-03-05 05:09:47');
 
@@ -286,7 +286,7 @@ CREATE TABLE IF NOT EXISTS `credito_cotizacions` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla dinero_facil.credito_cotizacions: ~21 rows (aproximadamente)
+-- Volcando datos para la tabla dinero_facil.credito_cotizacions: ~20 rows (aproximadamente)
 INSERT INTO `credito_cotizacions` (`id`, `valor_prestamo`, `frecuencia_cobro`, `interes`, `interes_mora`, `activo`, `createdAt`, `updatedAt`) VALUES
 	(1, 100000, 'Semanal', 15000, 8000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
 	(2, 200000, 'Semanal', 30000, 16000, 'SI', '2024-03-06 00:09:43', '2024-03-06 00:09:43'),
@@ -326,6 +326,40 @@ INSERT INTO `credito_estados` (`id`, `nombre_credito_tipo`, `createdAt`, `update
 	(3, 'Cancelado', '2024-03-05 02:34:58', '2024-03-05 02:34:58'),
 	(4, 'Paz&Salvo', '2024-03-05 02:35:40', '2024-03-05 02:35:40'),
 	(5, 'Incompleto', '2024-03-05 02:41:03', '2024-03-05 02:41:03');
+
+-- Volcando estructura para tabla dinero_facil.credito_pago_cuotas
+CREATE TABLE IF NOT EXISTS `credito_pago_cuotas` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_credito` bigint(20) unsigned NOT NULL,
+  `id_credito_pago_estado` bigint(20) unsigned NOT NULL,
+  `fecha_estimada_pago` date NOT NULL,
+  `fecha_pago` date DEFAULT NULL,
+  `valor_pagado` bigint(20) DEFAULT NULL,
+  `soporte_pago` varchar(100) DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.credito_pago_cuotas: ~1 rows (aproximadamente)
+INSERT INTO `credito_pago_cuotas` (`id`, `id_credito`, `id_credito_pago_estado`, `fecha_estimada_pago`, `fecha_pago`, `valor_pagado`, `soporte_pago`, `createdAt`, `updatedAt`) VALUES
+	(1, 4, 1, '2024-03-06', NULL, NULL, NULL, '2024-03-07 04:22:15', '2024-03-07 04:18:47');
+
+-- Volcando estructura para tabla dinero_facil.credito_pago_estados
+CREATE TABLE IF NOT EXISTS `credito_pago_estados` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `nombre_estado_pago` varchar(20) NOT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando datos para la tabla dinero_facil.credito_pago_estados: ~4 rows (aproximadamente)
+INSERT INTO `credito_pago_estados` (`id`, `nombre_estado_pago`, `createdAt`, `updatedAt`) VALUES
+	(1, 'Programado', '2024-03-07 02:36:52', '2024-03-07 02:36:52'),
+	(2, 'En Revision', '2024-03-07 02:36:45', '2024-03-07 02:34:42'),
+	(3, 'Aprobado', '2024-03-07 02:36:41', '2024-03-07 02:35:10'),
+	(4, 'Cancelado', '2024-03-07 02:36:33', '2024-03-07 02:35:53');
 
 -- Volcando estructura para tabla dinero_facil.users
 CREATE TABLE IF NOT EXISTS `users` (
