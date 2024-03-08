@@ -47,7 +47,7 @@ const input_user = [
    body('num_doc').notEmpty().withMessage('variable no existe o es nula'),   
    body('password').exists().withMessage('variable password no existe'),
    body('direccion').notEmpty().withMessage('variable no existe o es nula'),
-   body('activo').isBoolean().withMessage('Solo valores booleanos'),
+   body('activo').isIn(["SI","NO"]).withMessage('Solo es permitido los valores SI y NO'),
    body('id_user_rol', 'Invalido Rol').isInt().exists().custom(data => {
       return new Promise((resolve, reject) => {
       Rol.findOne({ where: { id: data } })

@@ -23,7 +23,7 @@ USE `dinero_facil`;
 CREATE TABLE IF NOT EXISTS `clientes` (
   `id` bigint(20) unsigned NOT NULL,
   `id_cliente_tipo` bigint(20) unsigned NOT NULL,
-  `id_usuario` bigint(20) unsigned NOT NULL,
+  `id_usuario` bigint(20) unsigned DEFAULT NULL,
   `email` varchar(100) NOT NULL,
   `num_celular` bigint(20) NOT NULL,
   `password` varchar(100) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS `clientes` (
 
 -- Volcando datos para la tabla dinero_facil.clientes: ~1 rows (aproximadamente)
 INSERT INTO `clientes` (`id`, `id_cliente_tipo`, `id_usuario`, `email`, `num_celular`, `password`, `cod_referido`, `cod_personal`, `fecha_aprobacion`, `createdAt`, `updatedAt`) VALUES
-	(1, 1, 0, 'test001@gmail.com', 0, '$2b$10$Mmym6f49uFclPsvapOPDlOPqzVJKNky/oJnmi9Xnezbs9Cdyn.AgC', '', '972b924adc', NULL, '2024-02-07 02:44:51', '2024-02-07 02:44:51');
+	(1, 1, 1, 'test001@gmail.com', 0, '$2b$10$Mmym6f49uFclPsvapOPDlOPqzVJKNky/oJnmi9Xnezbs9Cdyn.AgC', '', '972b924adc', NULL, '2024-03-08 05:06:00', '2024-03-08 05:06:00');
 
 -- Volcando estructura para tabla dinero_facil.cliente_actividad_ecos
 CREATE TABLE IF NOT EXISTS `cliente_actividad_ecos` (
@@ -86,7 +86,6 @@ CREATE TABLE IF NOT EXISTS `cliente_infos` (
   `id_user_tipo_doc` bigint(20) NOT NULL,
   `id_cliente_actividad_eco` bigint(20) NOT NULL,
   `id_cliente_sector_eco` bigint(20) NOT NULL,
-  `id_usuario` bigint(20) DEFAULT NULL,
   `nombres_cliente` varchar(100) NOT NULL,
   `apellidos_cliente` varchar(100) NOT NULL,
   `fecha_nac` date NOT NULL,
@@ -113,11 +112,11 @@ CREATE TABLE IF NOT EXISTS `cliente_infos` (
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla dinero_facil.cliente_infos: ~0 rows (aproximadamente)
-INSERT INTO `cliente_infos` (`id`, `id_cliente`, `id_dpto`, `id_ciudad`, `id_user_tipo_doc`, `id_cliente_actividad_eco`, `id_cliente_sector_eco`, `id_usuario`, `nombres_cliente`, `apellidos_cliente`, `fecha_nac`, `fecha_aprobacion`, `direccion`, `num_documento`, `otro_sector_y_actividad`, `nombre_empresa_labora`, `ingreso_mesual`, `gasto_mensual`, `foto_cliente`, `foto_doc_frontal`, `foto_doc_trasera`, `foto_recivo_publico`, `foto_pago_nomina`, `tratamiento_datos`, `terminos_y_condiciones`, `rf1_nombre_completo`, `rf1_num_celular`, `rf1_direccion`, `rf2_nombre_completo`, `rf2_num_celular`, `rf2_direccion`, `createdAt`, `updatedAt`) VALUES
-	(2, 1, 1, 0, 1, 1, 1, NULL, 'ruben', 'castillo', '1987-02-22', NULL, 'calle test - test', '123456789', '', 'lae-edu', 100000, 500000, 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_cliente.jpg', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_doc_frontal.', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_doc_trasera.', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_recivo_publi', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\a4a94a0146\\/foto_pago_nomina.', 1, 1, 'lina', '741852963', 'calle test - test 2', 'karen', '654987321', 'calle test - test3', '2024-03-05 05:01:25', '2024-03-05 05:01:25');
+-- Volcando datos para la tabla dinero_facil.cliente_infos: ~1 rows (aproximadamente)
+INSERT INTO `cliente_infos` (`id`, `id_cliente`, `id_dpto`, `id_ciudad`, `id_user_tipo_doc`, `id_cliente_actividad_eco`, `id_cliente_sector_eco`, `nombres_cliente`, `apellidos_cliente`, `fecha_nac`, `fecha_aprobacion`, `direccion`, `num_documento`, `otro_sector_y_actividad`, `nombre_empresa_labora`, `ingreso_mesual`, `gasto_mensual`, `foto_cliente`, `foto_doc_frontal`, `foto_doc_trasera`, `foto_recivo_publico`, `foto_pago_nomina`, `tratamiento_datos`, `terminos_y_condiciones`, `rf1_nombre_completo`, `rf1_num_celular`, `rf1_direccion`, `rf2_nombre_completo`, `rf2_num_celular`, `rf2_direccion`, `createdAt`, `updatedAt`) VALUES
+	(5, 1, 1, 0, 1, 1, 1, 'ruben', 'castillo', '1987-02-22', NULL, 'calle test - test', '123456789', '', 'lae-edu', 100000, 500000, 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\8f2f17f7e4\\/foto_cliente.jpg', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\8f2f17f7e4\\/foto_doc_frontal.', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\8f2f17f7e4\\/foto_doc_trasera.', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\8f2f17f7e4\\/foto_recivo_publi', 'D:\\Developer_dev\\Proyectos\\Credito_Facil\\Dinero_facil\\uploads\\temp\\doc\\8f2f17f7e4\\/foto_pago_nomina.', 1, 1, 'lina', '741852963', 'calle test - test 2', 'karen', '654987321', 'calle test - test3', '2024-03-08 05:06:00', '2024-03-08 05:06:00');
 
 -- Volcando estructura para tabla dinero_facil.cliente_sector_ecos
 CREATE TABLE IF NOT EXISTS `cliente_sector_ecos` (
@@ -170,15 +169,16 @@ CREATE TABLE IF NOT EXISTS `configs` (
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla dinero_facil.configs: ~5 rows (aproximadamente)
+-- Volcando datos para la tabla dinero_facil.configs: ~6 rows (aproximadamente)
 INSERT INTO `configs` (`id`, `nom_variable`, `valor_variable`, `detalle`, `createdAt`, `updatedAt`) VALUES
 	(1, 'correo_host', 'smtp.gmail.com', 'es le host de envio de correos', '2024-02-28 07:45:18', '2024-02-28 07:40:56'),
 	(2, 'correo_port', '465', 'el puerto que usa el envio de correo', '2024-03-05 05:02:09', '2024-02-28 07:41:33'),
 	(3, 'correo_secure', 'true', 'si posee seguridad ssl', '2024-02-28 07:46:35', '2024-02-28 07:42:03'),
 	(4, 'correo_auth_user', 'rubenx87@gmail.com', 'usuario del correo ', '2024-02-28 07:47:08', '2024-02-28 07:42:31'),
-	(5, 'correo_auth_pass', 'geob hemk czoj ypcd', 'pass del correo', '2024-02-28 08:15:37', '2024-02-28 07:42:41');
+	(5, 'correo_auth_pass', 'geob hemk czoj ypcd', 'pass del correo', '2024-02-28 08:15:37', '2024-02-28 07:42:41'),
+	(6, 'nombre_empresa', 'Credito Facil', 'nombre empresa usado en la app', '2024-03-08 06:15:33', '2024-03-08 06:15:01');
 
 -- Volcando estructura para tabla dinero_facil.config_mensajes
 CREATE TABLE IF NOT EXISTS `config_mensajes` (
@@ -191,9 +191,12 @@ CREATE TABLE IF NOT EXISTS `config_mensajes` (
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla dinero_facil.config_mensajes: ~0 rows (aproximadamente)
+-- Volcando datos para la tabla dinero_facil.config_mensajes: ~2 rows (aproximadamente)
+INSERT INTO `config_mensajes` (`id`, `nom_mensaje`, `asunto_mensaje`, `mensaje`, `detalle`, `tipo_mensaje`, `createdAt`, `updatedAt`) VALUES
+	(1, 'crear_update_cliente_info', 'Datos Personales', 'Estimado Cliente su información Personal ha sido subida al sistema, Pronto uno de nuestros asesores revisarán la información suministrada, para poder continuar con el Proceso de solicitud del crédito.', 'informa sobre la creacion o acyualizacion de cliente info ', 'Correo', '2024-03-08 06:14:05', '2024-03-08 05:47:25'),
+	(2, 'registro_cliente', 'Bienvenido', 'Estimado cliente se ha registrado satisfactoriamente a la plataforma ||1, por favor ingrese su usuario y contraseña  para continuar con el proceso de solicitud del crédito.   ', 'informa sobre el registro exitoso', 'Correo', '2024-03-08 06:14:30', '2024-03-08 06:09:27');
 
 -- Volcando estructura para tabla dinero_facil.creditos
 CREATE TABLE IF NOT EXISTS `creditos` (
@@ -352,9 +355,9 @@ CREATE TABLE IF NOT EXISTS `credito_pago_estados` (
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
--- Volcando datos para la tabla dinero_facil.credito_pago_estados: ~4 rows (aproximadamente)
+-- Volcando datos para la tabla dinero_facil.credito_pago_estados: ~3 rows (aproximadamente)
 INSERT INTO `credito_pago_estados` (`id`, `nombre_estado_pago`, `createdAt`, `updatedAt`) VALUES
 	(1, 'Programado', '2024-03-07 02:36:52', '2024-03-07 02:36:52'),
 	(2, 'En Revision', '2024-03-07 02:36:45', '2024-03-07 02:34:42'),
@@ -372,15 +375,15 @@ CREATE TABLE IF NOT EXISTS `users` (
   `num_celular` bigint(20) NOT NULL,
   `num_doc` varchar(20) NOT NULL,
   `direccion` varchar(200) NOT NULL,
-  `activo` tinyint(4) NOT NULL DEFAULT 1,
+  `activo` varchar(2) NOT NULL DEFAULT 'SI',
   `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `updatedAt` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Volcando datos para la tabla dinero_facil.users: ~2 rows (aproximadamente)
 INSERT INTO `users` (`id`, `id_user_tipo_doc`, `id_user_rol`, `nombre_completo`, `password`, `email`, `num_celular`, `num_doc`, `direccion`, `activo`, `createdAt`, `updatedAt`) VALUES
-	(1, 1, 1, 'Admin', 'Admin', 'admin@gmail.com', 1232465798, '123465789', 'callle 12#12-!2', 0, '2024-02-05 02:47:16', '2024-02-05 02:42:00'),
-	(2, 1, 1, 'Admin test', '$2b$10$fR088Y26Fv.dDKH3ACABG.Z7kPDmPGXwAJ.SRPZoeDrcbmsV9Lizq', 'admin@gmail.comm', 12324657987, '1234657898', 'callle 12#12-!2', 1, '2024-02-06 20:25:03', '2024-02-06 20:25:03');
+	(1, 1, 1, 'Admin', '$10$fR088Y26Fv.dDKH3ACABG.Z7kPDmPGXwAJ.SRPZoeDrcbmsV9Lizq', 'admin@gmail.com', 1232465798, '123465789', 'callle 12#12-!2', 'SI', '2024-03-08 03:17:02', '2024-02-05 02:42:00'),
+	(2, 1, 1, 'Admin test', '$2b$10$fR088Y26Fv.dDKH3ACABG.Z7kPDmPGXwAJ.SRPZoeDrcbmsV9Lizq', 'admin@gmail.comm', 12324657987, '1234657898', 'callle 12#12-!2', 'SI', '2024-03-08 03:17:06', '2024-02-06 20:25:03');
 
 -- Volcando estructura para tabla dinero_facil.user_rols
 CREATE TABLE IF NOT EXISTS `user_rols` (

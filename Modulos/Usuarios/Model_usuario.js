@@ -48,7 +48,7 @@ const User = sequelize.define("users", {
         allowNull: false,
     },
     activo: {
-        type: DataTypes.BOOLEAN,
+        type: DataTypes.STRING,
         allowNull: true
     }
 });

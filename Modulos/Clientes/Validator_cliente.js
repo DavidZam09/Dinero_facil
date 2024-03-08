@@ -5,6 +5,7 @@ const Cliente_act_eco = require("./Model_clientes_actividad_eco");
 const Cliente_sec_eco = require("./Model_clientes_sector_eco");
 const Tipo_doc = require("../Usuarios/Model_tipo_doc");
 const Cliente = require('./Model_cliente');
+const Sequelize = require("sequelize");
 
 const registrar_cliente = [
    check("cod_referido").exists().withMessage("La variable Password no existe"),
@@ -46,7 +47,14 @@ const registrar_cliente = [
 ];
 
 const login_cliente = [
-   body("password").exists().withMessage("La variable Password no existe"),
+   check("password")
+      .isLength({ min: 6, max: 16 })
+      .withMessage("El campo debe tener entre 6 y 16 caracteres"),
+   check("password")
+      .matches(/^(?=.*[A-Z])(?=.*\d).+$/)
+      .withMessage(
+         "El campo debe contener al menos una letra mayúscula y un número"
+      ),
    body("email").isEmail().withMessage("Solo se admiten correos"),
    body("email", "Invalid Email")
       .exists()
@@ -82,43 +90,66 @@ const lista_cliente_infoxcliente = [
 
 const input_cliente_info = [
    body('id', "Invalido Cliente_info")
-   .exists()
-   .custom((data) => {
-      return new Promise((resolve, reject) => {
-         if ( ( data ==='' ) || (data ===null)) {
-            resolve(true);
-         }else{
-            Cliente_info.findOne({ where: { id: data } }).then((Exist) => {
-               if (Exist === null) {
-                  reject(new Error("Cliente no existe."));
-               } else {
-                  resolve(true);
-               }
-            });
-         }
-      });
-   }),
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            if ((data === '') || (data === null)) {
+               resolve(true);
+            } else {
+               Cliente_info.findOne({ where: { id: data } }).then((Exist) => {
+                  if (Exist === null) {
+                     reject(new Error("Cliente no existe."));
+                  } else {
+                     resolve(true);
+                  }
+               });
+            }
+         });
+      }),
    body("id_cliente", "Invalido Cliente")
       .isInt()
       .exists()
       .custom(async (data, { req }) => {
          return new Promise(async (resolve, reject) => {
-         if ( ( req.body.id ==='' ) || (req.body.id === null)){
-            const cliente_info = await Cliente_info.findOne({ where: { id_cliente: data } })
-            if( ( cliente_info === '' ) || ( cliente_info === null )){
-               resolve(true);
-            }else{
-               reject(new Error("Cliente_info ya existe."));
-            }
-         }else{
-            const cliente = await Cliente_info.findOne({ where: { id_cliente: data, id: req.body.id } })
-            if (cliente === null) {
-               reject(new Error("Cliente_info no existe o es erroneo."));
+            if ((req.body.id === '') || (req.body.id === null)) {
+               const cliente_info = await Cliente_info.findOne({ where: { id_cliente: data } })
+               if ((cliente_info === '') || (cliente_info === null)) {
+                  const cliente = await Cliente.findOne({
+                     where:
+                     {
+                        id: data,
+                        id_cliente_tipo: { [Sequelize.Op.in]: [1, 5] }
+                     }
+                  })
+                  if (cliente !== null) {
+                     resolve(true);
+                  } else {
+                     reject(new Error("Solo se adminten Clientes que esten en estado Nuevo o Imcompleto."));
+                  }
+               } else {
+                  reject(new Error("Cliente_info ya existe."));
+               }
             } else {
-               resolve(true);
+               const cliente_info = await Cliente_info.findOne({ where: { id_cliente: data, id: req.body.id } })
+               if (cliente_info === null) {
+                  reject(new Error("Cliente_info no existe o es erroneo."));
+               } else {
+                  const cliente = await Cliente.findOne({
+                     where:
+                     {
+                        id: data,
+                        id_cliente_tipo: { [Sequelize.Op.in]: [1, 5] }
+                     }
+                  })
+                  console.log(cliente);
+                  if (cliente !== null) {
+                     resolve(true);
+                  } else {
+                     reject(new Error("El Cliente debe estar en estado Nuevo o Imcompleto."));
+                  }
+               }
             }
-         }
-      });
+         });
       }),
    body("id_cliente_actividad_eco", "Invalido Actividad Economica")
       .isInt()
@@ -149,8 +180,8 @@ const input_cliente_info = [
          });
       }),
    body('id_user_tipo_doc', 'Invalido Tipo Documento').isInt().exists().custom(data => {
-         return new Promise((resolve, reject) => {
-            Tipo_doc.findOne({ where: { id: data } })
+      return new Promise((resolve, reject) => {
+         Tipo_doc.findOne({ where: { id: data } })
             .then(Exist => {
                if (Exist === null) {
                   reject(new Error('Tipo Documento no existe.'))
@@ -158,8 +189,8 @@ const input_cliente_info = [
                   resolve(true)
                }
             })
-         })
-      }),
+      })
+   }),
    body("id_dpto").isInt().withMessage("Solo se admiten numero enteros"),
    body("id_ciudad").isInt().withMessage("Solo se admiten numero enteros"),
    body('nombres_cliente').notEmpty().withMessage('variable no existe o es nula'),

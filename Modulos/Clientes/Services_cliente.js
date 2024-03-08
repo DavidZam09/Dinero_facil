@@ -13,6 +13,7 @@ const Actividad_eco = require("./Model_clientes_actividad_eco");
 const Sector_eco = require("./Model_clientes_sector_eco");
 const Cliente_info = require("./Model_clientes_info");
 const Config = require("../Creditos/Model_config");
+const Config_mensajes = require("../Creditos/Model_config_mensaje");
 const Email = require("../../Helpers/Email_config");
 
 const { v4: uuidv4 } = require("uuid");
@@ -70,11 +71,29 @@ async function registrar_cliente(data) {
   try {
     var cliente = await Cliente.create(data);
     delete cliente.password;
-    return { successful: true, data: cliente };
   } catch (error) {
     console.log(error);
     return { successful: false, error: error };
   }
+
+  // envio de correo
+  const mensajes = await Config_mensajes.findOne({ where: { id: 2 } });
+  const config = await Config.findOne({
+    where:{
+       id: data,
+       id_cliente_tipo: { [Sequelize.Op.in]: [4, 6] }
+    }
+ })
+  const mailOptions = {
+    from: config[0].valor_variable,
+    to: data.email,
+    subject:  mensajes.asunto_mensaje,
+    text: mensajes.mensajes.replace('||1', config[1].valor_variable)//mensajes.mensajes
+  };
+  const transporter = await Email.createTransporter();
+  await Email.sendMail(transporter, mailOptions);
+
+  return { successful: true, data: cliente };
 }
 
 async function login_cliente(data) {
@@ -139,21 +158,64 @@ async function lista_cliente_infoxcliente(id) {
   return ({ successful: true, data: data });
 }
 
-async function input_cliente_info(datos, array_names, array_files) {
+async function input_cliente_info(datos, array_files) {
 
   var resp = '';
   var data = '';
   //creo la nueva carpeta donde van a estar los documentos 
-  const dir = `../../uploads/doc/${datos.id_cliente}/`;
-  const uploadDir = path.join(__dirname, dir);
-  if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
+  var dir = `../../uploads/doc/${datos.id_cliente}/`;
+  const destDir = path.join(__dirname, dir);
+  if (!fs.existsSync(destDir)) {
+    fs.mkdirSync(destDir, { recursive: true });
   }
 
+  dir = `../../uploads/temp/doc/${datos.nom_carpeta}/`;
+  const sourceDir = path.join(__dirname, dir);
+
+  //muevo archivos
+  fs.readdir(sourceDir, (err, files) => {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    files.forEach(file => {
+      const oldPath = path.join(sourceDir, file);
+      const newPath = path.join(destDir, file);
+      fs.rename(oldPath, newPath, (err) => {
+        if (err) {
+          console.error(err);
+          return;
+        }
+        console.log(`Archivo '${file}' movido correctamente.`);
+      });
+    });
+  });
+
+  var titulo = null
   try {
-    if (datos.id === "" || datos.id === null){
-      data = await Cliente_info.create(datos);
-    }else{
+    if (datos.id === "" || datos.id === null) {
+      titulo = "Creacion ";
+      data = await Cliente_info.create(datos); // guardo
+
+      // filtro a usuario con menos carga laboral en tres dias 
+      const select = `
+      SELECT 
+        u.id, 
+        IFNULL(cont.contador, 0) AS contador
+      FROM users u 
+      LEFT JOIN (
+        SELECT  COUNT(c.id) contador, c.id_usuario AS id FROM clientes AS c
+        INNER JOIN cliente_infos as ci ON  ci.id_cliente = c.id
+        WHERE ci.createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 3 DAY) AND NOW()
+        GROUP BY c.id_usuario
+      ) AS cont ON cont.id = u.id ORDER BY IFNULL(cont.contador, 0) ASC LIMIT 1`;
+      const user = await Cliente_info.sequelize.query(select, { type: QueryTypes.SELECT });
+
+      //actualizo usuario encargado
+      const cliente = await Cliente.findOne({ where: { id: datos.id_cliente } });
+      cliente.update({ id_usuario: user[0].id });
+    } else {
+      titulo = "Actualicion "
       data = await Cliente_info.findOne({ where: { id: datos.id } });
       data.update(datos);
     }
@@ -163,16 +225,24 @@ async function input_cliente_info(datos, array_names, array_files) {
       data: "Error Al intentar Guardar en base de datos",
     };
   }
-  
+
   resp = await lista_cliente_infoxcliente(data.id_cliente);
+
   // envio de correo
+  const mensajes = await Config_mensajes.findOne({ where: { id: 1 } });
+  const correo_envia = await Config.findOne({ where: { id: 4 } });
   const mailOptions = {
-    from: 'rubenx87@example.com',
+    from: correo_envia.valor_variable,
     to: resp.data[0].email,
-    subject: 'Asunto del correo',
-    text: 'Contenido del correo'
+    subject: titulo + mensajes.asunto_mensaje,
+    text: mensajes.mensajes
   };
   const transporter = await Email.createTransporter();
   await Email.sendMail(transporter, mailOptions);
+
+  return {
+    successful: true,
+    data: resp,
+  };
 
 }

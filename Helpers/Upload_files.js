@@ -22,13 +22,15 @@ async function files_save(req, res, next) {
   var ext = '';
   var nombreArchivo = '';
 
-  var dir = `../uploads/temp/doc/${generarCodigoUnico()}/`;
+  const cod = generarCodigoUnico();
+  var dir = `../uploads/temp/doc/${cod}/`;
   uploadDir = path.join(__dirname, dir);
 
   if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
   }
 
+  req.body['nom_carpeta'] = cod;
   //captura la data en body
   busboy.on('field', (fieldname, value) => {
     req.body[fieldname] = value;

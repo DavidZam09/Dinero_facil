@@ -77,7 +77,7 @@ async function input_cliente_info(req, res, next) {
         borrarContenidoCarpeta(req.files);
         return res.json({ successful: false, errors: errors.array() });
     }
-
+    
     var array_name = [];
 
     //valido ext de documento
@@ -111,7 +111,7 @@ async function input_cliente_info(req, res, next) {
         }
     }
 
-    return Cliente.input_cliente_info( req.body, array_name, req.files ).then((respuerta) => {
+    return Cliente.input_cliente_info( req.body, req.files ).then((respuerta) => {
         return res.send(respuerta);
     });
 }
