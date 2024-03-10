@@ -110,10 +110,9 @@ CREATE TABLE IF NOT EXISTS `cliente_tipos` (
 -- Volcando datos para la tabla dinero_facil.cliente_tipos: ~5 rows (aproximadamente)
 INSERT INTO `cliente_tipos` (`id`, `nombre_tipo_cliente`, `createdAt`, `updatedAt`) VALUES
 	(1, 'Nuevo', '2024-02-07 00:19:00', '2024-02-07 00:19:00'),
-	(2, 'En Estudio', '2024-02-07 00:19:20', '2024-02-07 00:19:20'),
-	(3, 'Aprobado', '2024-02-07 00:19:38', '2024-02-07 00:19:38'),
-	(4, 'No Apto', '2024-02-07 00:20:05', '2024-02-07 00:20:05'),
-	(5, 'Incompleto', '2024-02-07 00:20:51', '2024-02-07 00:20:24');
+	(2, 'Aprobado', '2024-02-07 00:19:38', '2024-02-07 00:19:38'),
+	(3, 'No Apto', '2024-02-07 00:20:05', '2024-02-07 00:20:05'),
+	(4, 'Incompleto', '2024-02-07 00:20:51', '2024-02-07 00:20:24');
 
 -- Volcando estructura para tabla dinero_facil.configs
 CREATE TABLE IF NOT EXISTS `configs` (
@@ -316,6 +315,9 @@ CREATE TABLE IF NOT EXISTS `users` (
   CONSTRAINT `FK1_id_user_rol` FOREIGN KEY (`id_user_rol`) REFERENCES `user_rols` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
   CONSTRAINT `FK1_id_user_tipo_doc` FOREIGN KEY (`id_user_tipo_doc`) REFERENCES `user_tipo_docs` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `users` (`id`, `id_user_tipo_doc`, `id_user_rol`, `nombre_completo`, `password`, `email`, `num_celular`, `num_doc`, `direccion`, `activo`, `createdAt`, `updatedAt`) VALUES 
+(1, 1, 1, 'Admin', '$2b$10$YE26LrNqyP8iVzoB1D308OVdKsyeZq7r6GpI.7SNomfolZo9JkXLy', 'admin@gmail.com', 123456789, '12121212', 'callle 12 # 12 -12', 'SI', '2024-03-09 21:42:38', '2024-03-09 21:42:38');
 
 -- Volcando estructura para tabla dinero_facil.cliente_infos
 CREATE TABLE IF NOT EXISTS `cliente_infos` (

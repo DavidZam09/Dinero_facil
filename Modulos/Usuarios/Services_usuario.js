@@ -46,7 +46,7 @@ async function lista_usersxrol(id) {
     u.num_doc, u.direccion, u.activo, u.createdAt, u.updatedAt,  r.nombre_rol, tp.nombre_tipo_doc 
     FROM users u 
     inner join user_rols r on r.id = u.id_user_rol
-    inner join user_tipo_docs as tp on tp.id = u.id_user_tipo_doc where u.activo = 1 and r.id = ${id}`;
+    inner join user_tipo_docs as tp on tp.id = u.id_user_tipo_doc where u.activo = "SI" and r.id = ${id}`;
     var data = await User.sequelize.query(select, { type: QueryTypes.SELECT });
     return ({ successful: true, data: data });
 }
@@ -130,13 +130,13 @@ async function update_user(data) {
     };
 
     if ((data.password === '') || (data.password === null)) { } else {
-        const salt = await bcrypt.genSalt(process.env.SAL_ROUND);
+        const salt = await bcrypt.genSalt(process.env.SAL);
         obj.password = await bcrypt.hash(data.password, salt);
     }
 
     try {
-        user.update(obj);
-        return lista_users(data.id);
+        await user.update(obj);
+        return await lista_users(data.id);
     } catch (error) {
         console.log(error);
         return { successful: false, error: error };

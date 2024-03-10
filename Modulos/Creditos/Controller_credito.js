@@ -24,6 +24,10 @@ function lista_bancos(req, res, next) {
 }
 
 function un_credito(req, res, next) {
+    const errors =  validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
     Creditos.un_credito( req.query.id ).then((respuerta) => {
         return res.send(respuerta);
     });
@@ -40,7 +44,6 @@ function input_credito(req, res, next) {
     if (!errors.isEmpty()) {
         return res.json({ successful: false, errors: errors.array() });
     }
-    
     Creditos.input_credito(req.body).then((respuerta) => {
         return res.send(respuerta);
     });

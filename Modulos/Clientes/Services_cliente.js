@@ -1,10 +1,9 @@
-const { QueryTypes } = require("sequelize");
+const { QueryTypes, Op } = require("sequelize");
 const SQL = require("sequelize");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 var path = require("path");
-const Sequelize = require("sequelize");
 
 const Clientes_tipo = require("./Model_clientes_tipo");
 const Cliente = require("./Model_cliente");
@@ -17,12 +16,11 @@ const Config_mensajes = require("../Creditos/Model_config_mensaje");
 const Email = require("../../Helpers/Email_config");
 
 const { v4: uuidv4 } = require("uuid");
+const User = require("../Usuarios/Model_usuario");
 
 function generarCodigoUnico() {
   const uuid = uuidv4();
-  const codigoAlfanumerico = uuid
-    .replace(/-/g, "")
-    .substring(0, process.env.LOG_GUID);
+  const codigoAlfanumerico = uuid.replace(/-/g, "").substring(0, process.env.LOG_GUID);
   return codigoAlfanumerico;
 }
 
@@ -77,18 +75,18 @@ async function registrar_cliente(data) {
   }
 
   // envio de correo
-  const mensajes = await Config_mensajes.findOne({ where: { id: 2 } });
-  const config = await Config.findOne({
+  var mensajes = await Config_mensajes.findOne({ where: { id: 2 } });
+  const config = await Config.findAll({
     where:{
-       id: data,
-       id_cliente_tipo: { [Sequelize.Op.in]: [4, 6] }
+       id: { [Op.in]: [4,6] }
     }
- })
+ });
+   
   const mailOptions = {
-    from: config[0].valor_variable,
+    from: config.valor_variable,
     to: data.email,
     subject:  mensajes.asunto_mensaje,
-    text: mensajes.mensajes.replace('||1', config[1].valor_variable)//mensajes.mensajes
+    text:  mensajes.mensaje.replace('||1', config[1].valor_variable)//mensajes.mensajes
   };
   const transporter = await Email.createTransporter();
   await Email.sendMail(transporter, mailOptions);
@@ -219,10 +217,12 @@ async function input_cliente_info(datos) {
       //actualizo usuario encargado
       const cliente = await Cliente.findOne({ where: { id: datos.id_cliente } });
       cliente.update({ id_usuario: user[0].id });
-    } else {
+    }else {
       titulo = "Actualicion "
       data = await Cliente_info.findOne({ where: { id: datos.id } });
       data.update(datos);
+      const cliente = await Cliente.findOne({ where: { id: datos.id_cliente } });
+      user = await User.findAll({ where: { id: cliente.id_usuario } });
     }
   } catch (error) {
     return {
@@ -231,14 +231,13 @@ async function input_cliente_info(datos) {
     };
   }
 
-  resp = await lista_cliente_infoxcliente(data.id_cliente);
+  resp = await lista_cliente_infoxcliente(datos.id_cliente);
 
   const mensajes = await Config_mensajes.findAll({
     where:{
-       id: data,
-       id_cliente_tipo: { [Sequelize.Op.in]: [1, 3] }
+       id: { [Op.in]: [1, 3] }
     }
- })
+ });
 
   // envio de correo cliente
   const correo_envia = await Config.findOne({ where: { id: 4 } });
@@ -246,28 +245,24 @@ async function input_cliente_info(datos) {
     from: correo_envia.valor_variable,
     to: resp.data[0].email,
     subject: titulo + mensajes[0].asunto_mensaje,
-    text: mensajes[0].mensajes
+    text: mensajes[0].mensaje
   };
   const transporter1 = await Email.createTransporter();
   await Email.sendMail(transporter1, mailOptions1);
 
   // envio de correo admin
-  var text = mensajes[0].asunto_mensaje.replace('||1', titulo);
-  text = mensajes[0].asunto_mensaje.replace('||2', `${ resp.data[0].nombres_cliente } ${ resp.data[0].apellidos_cliente }`);
-  text = mensajes[0].asunto_mensaje.replace('||3', resp.data[0].email);
-  text = mensajes[0].asunto_mensaje.replace('||4', resp.data[0].num_celular);
+  var text = mensajes[1].mensaje.replace('||1', titulo);
+  text = text.replace('||2', `${ resp.data[0].nombres_cliente } ${ resp.data[0].apellidos_cliente }`);
+  text = text.replace('||3', resp.data[0].email);
+  text = text.replace('||4', resp.data[0].num_celular);
   const mailOptions2 = {
     from: correo_envia.valor_variable,
-    to: user.email,//resp.data[0].email,
-    subject: mensajes[0].asunto_mensaje.replace('||1', titulo),
+    to: user[0].email,
+    subject: mensajes[1].asunto_mensaje.replace('||1', titulo),
     text: text,
   };
   const transporter2 = await Email.createTransporter();
   await Email.sendMail(transporter2, mailOptions2);
 
-  return {
-    successful: true,
-    data: resp,
-  };
-
+  return resp
 }

@@ -106,8 +106,7 @@ async function input_credito(datos) {
   const correo_envia = await Config.findOne({ where: { id: 4 } });
   const mensajes = await Config_mensajes.findAll({
     where: {
-      id: data,
-      id_cliente_tipo: { [Sequelize.Op.in]: [4, 5] }
+      id: { [Sequelize.Op.in]: [4, 5] }
     }
   })
 
@@ -269,8 +268,7 @@ async function update_credito_pagoxcliente(datos) {
   const correo_envia = await Config.findOne({ where: { id: 4 } });
   const mensajes = await Config_mensajes.findAll({
     where: {
-      id: data,
-      id_cliente_tipo: { [Sequelize.Op.in]: [6, 7] }
+      id: { [Sequelize.Op.in]: [6, 7] }
     }
   })
 

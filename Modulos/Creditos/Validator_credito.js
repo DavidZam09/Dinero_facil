@@ -19,13 +19,9 @@ const input_credito = [
             } else {
                Creditos.findOne({ where: { id: data } }).then((Exist) => {
                   if (Exist === null) {
-                     reject(new Error("Credito no existe."));
+                     reject(new Error("Credito no existe"));
                   } else {
-                     if( (Exist.id_credito_estado === 5) || (Exist.id_credito_estado === 1) ){
-                        resolve(true);
-                     }else{
-                        reject(new Error("No se permite actualizar un Credito que no este en estado Incompleto o Solicitado"));
-                     }
+                     resolve(true);
                   }
                });
             }
@@ -71,17 +67,21 @@ const input_credito = [
       .exists()
       .custom((data) => {
          return new Promise(async (resolve, reject) => {
-            await Cliente.findOne({ where: { id: data, id_cliente_tipo: 3} }).then((Exist) => {
+            await Cliente.findOne({ where: { id: data} }).then((Exist) => {
                if (Exist === null) {
                   reject(new Error("Cliente no existe o no ha sido aprobado."));
                } else {
-                  Creditos.findOne({ where: { id_cliente: data } }).then((Exist) => {
-                     if ( (Exist.id_credito_estado === 2) || (Exist.id_credito_estado === 3)) {
-                        resolve(true);
-                     } else {
-                        reject(new Error("Tienes un Credito en Proceso, por tanto no puedes solicitar un Nuevo Credito asta estar en paz y salvo"));
-                     }
-                  });
+                  if ( Exist.id_cliente_tipo === 1 ){
+                     Creditos.findOne({ where: { id_cliente: data, id_credito_estado: { [Sequelize.Op.in]: [1,2,5] } } }).then((Exist) => {
+                        if (Exist === null) {
+                           reject(new Error("Ya posees un credito en curso"));
+                        } else {
+                           resolve(true);
+                        }
+                     });
+                  }else{
+                     reject(new Error("El cliente no ha sido aprobado"));
+                  }
                }
             });
          });
@@ -190,7 +190,7 @@ const input_credito_cotizacion = [
 ];
 
 const un_credito = [
-   body('id', "Invalido Credito")
+   check('id', "Invalido Credito")
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {

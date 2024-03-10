@@ -27,7 +27,7 @@ const login_user = [
    body('email').isEmail().withMessage('Solo se admiten correos'),
    body('email', 'Invalid Email').exists().custom(data => {
       return new Promise((resolve, reject) => {
-         User.findOne({ where: { email: data, activo: 1 } })
+         User.findOne({ where: { email: data, activo: "SI" } })
             .then(Exist => {
                if (Exist === null) {
                   reject(new Error('Email no existe.'))

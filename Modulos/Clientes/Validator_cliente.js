@@ -118,7 +118,7 @@ const input_cliente_info = [
                      where:
                      {
                         id: data,
-                        id_cliente_tipo: { [Sequelize.Op.in]: [1, 5] }
+                        id_cliente_tipo: { [Sequelize.Op.in]: [1, 4] }
                      }
                   })
                   if (cliente !== null) {
@@ -138,7 +138,7 @@ const input_cliente_info = [
                      where:
                      {
                         id: data,
-                        id_cliente_tipo: { [Sequelize.Op.in]: [1, 5] }
+                        id_cliente_tipo: { [Sequelize.Op.in]: [1, 4] }
                      }
                   })
                   if (cliente !== null) {
