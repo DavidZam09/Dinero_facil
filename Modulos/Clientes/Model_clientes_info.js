@@ -16,11 +16,11 @@ const cliente_info = sequelize.define("cliente_info", {
     }
   },
   id_dpto: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },  
   id_ciudad: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.STRING,
     allowNull: false,
   },
   id_user_tipo_doc: {

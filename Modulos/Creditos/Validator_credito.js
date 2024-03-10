@@ -65,18 +65,22 @@ const input_credito = [
    body("id_cliente", "Invalido Cliente")
       .isInt()
       .exists()
-      .custom((data) => {
+      .custom((data, { req }) => {
          return new Promise(async (resolve, reject) => {
             await Cliente.findOne({ where: { id: data} }).then((Exist) => {
                if (Exist === null) {
                   reject(new Error("Cliente no existe o no ha sido aprobado."));
                } else {
                   if ( Exist.id_cliente_tipo === 1 ){
-                     Creditos.findOne({ where: { id_cliente: data, id_credito_estado: { [Sequelize.Op.in]: [1,2,5] } } }).then((Exist) => {
-                        if (Exist === null) {
-                           reject(new Error("Ya posees un credito en curso"));
-                        } else {
+                     Creditos.findOne({ where: { id_cliente: data, id_credito_estado: { [Sequelize.Op.in]: [1,5] } } }).then((Exist) => {
+                        if (Exist === null) {   
                            resolve(true);
+                        } else {
+                           if( parseInt(Exist.id) === parseInt(req.body.id) ){
+                              resolve(true);
+                           }else{
+                              reject(new Error("Ya posees un credito en curso"));
+                           }
                         }
                      });
                   }else{
@@ -89,7 +93,7 @@ const input_credito = [
    body("id_credito_cotizacion", "Invalido Cliente")
       .isInt()
       .exists()
-      .custom((data) => {
+      .custom((data, { req }) => {
          return new Promise(async (resolve, reject) => {
             if ((req.body.id === '') || (req.body.id === null)){
                await Credito_cotizacion.findOne({ where: { id: data} }).then((Exist) => {

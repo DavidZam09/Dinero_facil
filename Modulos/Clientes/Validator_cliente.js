@@ -1,11 +1,16 @@
 const { body, check } = require("express-validator");
+const Sequelize = require("sequelize");
 
 const Cliente_info = require("./Model_clientes_info");
 const Cliente_act_eco = require("./Model_clientes_actividad_eco");
 const Cliente_sec_eco = require("./Model_clientes_sector_eco");
-const Tipo_doc = require("../Usuarios/Model_tipo_doc");
 const Cliente = require('./Model_cliente');
-const Sequelize = require("sequelize");
+
+const Tipo_doc = require("../Usuarios/Model_tipo_doc");
+const User = require("../Usuarios/Model_usuario");
+
+/////////////////////////////////////////////////////////////////// validaciones para los Clientes //////////////////////////////////////////////////////////////////
+
 
 const registrar_cliente = [
    check("cod_referido").exists().withMessage("La variable Password no existe"),
@@ -211,9 +216,47 @@ const input_cliente_info = [
    body("rf2_direccion").notEmpty().withMessage('variable no existe o es nula')
 ];
 
+/////////////////////////////////////////////////////////////////// validaciones para los admin //////////////////////////////////////////////////////////////////
+
+const lista_clientesxadmin = [
+   check("id", "Invalido Usuario")
+      .isInt()
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            User.findOne({ where: { id: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Usuario no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      }),
+   ];
+
+   const update_aprobacion_cliente = [
+      check("id", "Invalido Usuario")
+         .isInt()
+         .exists()
+         .custom((data) => {
+            return new Promise((resolve, reject) => {
+               User.findOne({ where: { id: data } }).then((Exist) => {
+                  if (Exist === null) {
+                     reject(new Error("Usuario no existe."));
+                  } else {
+                     resolve(true);
+                  }
+               });
+            });
+         }),
+      ];
+
 module.exports = {
    registrar_cliente,
    login_cliente,
    lista_cliente_infoxcliente,
-   input_cliente_info
+   input_cliente_info,
+   lista_clientesxadmin,
+   update_aprobacion_cliente
 };

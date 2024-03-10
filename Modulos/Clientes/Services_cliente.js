@@ -1,5 +1,4 @@
 const { QueryTypes, Op } = require("sequelize");
-const SQL = require("sequelize");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -32,7 +31,43 @@ module.exports = {
   lista_sector_eco,
   lista_cliente_infoxcliente,
   input_cliente_info,
+  lista_clientesxadmin,
+  update_aprobacion_cliente
 };
+
+/////////////////////////////////////////////////////////////////// Servicios de los Admin //////////////////////////////////////////////////////////////////
+async function lista_clientesxadmin(id) {
+  var select = `SELECT ci.*, c.num_celular, c.email, ct.nombre_tipo_cliente, 
+  utd.nombre_tipo_doc, cae.nombre_actividad_eco, cse.nombre_sector_eco
+  FROM cliente_infos AS ci
+  INNER JOIN user_tipo_docs AS utd ON  ci.id_user_tipo_doc = utd.id
+  INNER JOIN cliente_actividad_ecos AS cae ON  ci.id_cliente_actividad_eco = cae.id
+  INNER JOIN cliente_sector_ecos AS cse ON  ci.id_cliente_sector_eco = cse.id
+  INNER JOIN clientes AS c ON ci.id_cliente = ci.id_cliente = c.id
+  INNER JOIN users AS u ON c.id_usuario = u.id
+  inner JOIN cliente_tipos AS ct on c.id_cliente_tipo = ct.id
+  WHERE c.id = ${id}`;
+  var data = await User.sequelize.query(select, { type: QueryTypes.SELECT });
+  return ({ successful: true, data: data });
+}
+
+async function update_aprobacion_cliente(id) {
+  var select = `SELECT ci.*, c.num_celular, c.email, ct.nombre_tipo_cliente, 
+  utd.nombre_tipo_doc, cae.nombre_actividad_eco, cse.nombre_sector_eco
+  FROM cliente_infos AS ci
+  INNER JOIN user_tipo_docs AS utd ON  ci.id_user_tipo_doc = utd.id
+  INNER JOIN cliente_actividad_ecos AS cae ON  ci.id_cliente_actividad_eco = cae.id
+  INNER JOIN cliente_sector_ecos AS cse ON  ci.id_cliente_sector_eco = cse.id
+  INNER JOIN clientes AS c ON ci.id_cliente = ci.id_cliente = c.id
+  INNER JOIN users AS u ON c.id_usuario = u.id
+  inner JOIN cliente_tipos AS ct on c.id_cliente_tipo = ct.id
+  WHERE c.id = ${id}`;
+  var data = await User.sequelize.query(select, { type: QueryTypes.SELECT });
+  return ({ successful: true, data: data });
+}
+
+
+/////////////////////////////////////////////////////////////////// Servicios de los clientes //////////////////////////////////////////////////////////////////
 
 /* servivios de cliente */
 

@@ -12,8 +12,34 @@ module.exports = {
     lista_sector_eco,
     lista_cliente_infoxcliente,
     input_cliente_info,
-    borrarContenidoCarpeta
+    borrarContenidoCarpeta,
+    lista_clientesxadmin,
+    update_aprobacion_cliente
 };
+
+/////////////////////////////////////////////////////////////////// Controlador para los Admin //////////////////////////////////////////////////////////////////
+function lista_clientesxadmin(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
+    Cliente.lista_clientesxadmin(req.query.id).then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+function update_aprobacion_cliente(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
+    Cliente.update_aprobacion_cliente(req.body).then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+
+/////////////////////////////////////////////////////////////////// Controlador para los Clientes //////////////////////////////////////////////////////////////////
 
 function dptxciudades(req, res, next) {
     fs.readFile(__dirname + "/dpt_y_ciudades.json", "utf8", function (err, data) {

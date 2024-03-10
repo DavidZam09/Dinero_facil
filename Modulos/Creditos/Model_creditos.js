@@ -8,7 +8,7 @@ const Cliente = require('../Clientes/Model_cliente');
 const Tipo_doc = sequelize.define("credito", {
   id_credito_estado: {
     type: DataTypes.INTEGER,
-    allowNull: false,
+    allowNull: true,
         references: {
         model: Credito_estados,
         key: 'id'
