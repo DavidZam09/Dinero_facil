@@ -22,14 +22,6 @@ const Tipo_doc = sequelize.define("credito", {
         key: 'id'
     }
   }, 
-  id_usuario_asignado: {
-    type: DataTypes.INTEGER,
-    allowNull: true,
-      references: {
-        model: Usuario,
-        key: 'id'
-    }
-  }, 
   id_cliente: {
     type: DataTypes.INTEGER,
     allowNull: false,
@@ -38,13 +30,9 @@ const Tipo_doc = sequelize.define("credito", {
         key: 'id'
     }
   }, 
-  valor_credito: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
-  entrega_en_efectivo: {
+  nota_cliente: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: true
   },
   tipo_cobro: {
     type: DataTypes.STRING,
@@ -58,17 +46,25 @@ const Tipo_doc = sequelize.define("credito", {
     type: DataTypes.STRING,
     allowNull: true
   },
-  periodicidad_cobro: {
-    type: DataTypes.INTEGER,
-    allowNull: false
-  },
   num_cuotas: {
     type: DataTypes.INTEGER,
     allowNull: false
   },
-  nota_cliente: {
-    type: DataTypes.STRING,
+  valor_credito: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  valor_interes: {
+    type: DataTypes.INTEGER,
     allowNull: true
+  },
+  valor_interes_mora: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  frecuencia_cobro: {
+    type: DataTypes.INTEGER,
+    allowNull: false
   },
   fec_desembolso: {
     type: DataTypes.DATE,
@@ -77,8 +73,11 @@ const Tipo_doc = sequelize.define("credito", {
   fec_pazysalvo: {
     type: DataTypes.DATE,
     allowNull: true
+  },
+  nota_admin: {
+    type: DataTypes.STRING,
+    allowNull: true
   }
-  
 });
 
 module.exports = Tipo_doc;

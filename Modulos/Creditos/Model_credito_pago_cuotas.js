@@ -20,6 +20,10 @@ const Credito_pago_cuotas = sequelize.define("credito_pago_cuotas", {
         key: 'id'
     }
   }, 
+  num_pago: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+  }, 
   fecha_estimada_pago: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -36,6 +40,10 @@ const Credito_pago_cuotas = sequelize.define("credito_pago_cuotas", {
     type: DataTypes.STRING,
     allowNull: true,
   },
+  nota_admin: {
+    type: DataTypes.STRING,
+    allowNull: true
+  }
 });
 
 module.exports = Credito_pago_cuotas;

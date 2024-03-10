@@ -11,7 +11,8 @@ module.exports = {
     lista_actividad_eco,
     lista_sector_eco,
     lista_cliente_infoxcliente,
-    input_cliente_info
+    input_cliente_info,
+    borrarContenidoCarpeta
 };
 
 function dptxciudades(req, res, next) {
@@ -111,7 +112,7 @@ async function input_cliente_info(req, res, next) {
         }
     }
 
-    return Cliente.input_cliente_info( req.body, req.files ).then((respuerta) => {
+    return Cliente.input_cliente_info( req.body ).then((respuerta) => {
         return res.send(respuerta);
     });
 }

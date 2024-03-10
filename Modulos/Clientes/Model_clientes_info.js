@@ -134,7 +134,11 @@ const cliente_info = sequelize.define("cliente_info", {
   rf2_direccion: {
     type: DataTypes.STRING,
     allowNull: false,
-  }
+  },
+  nota_admin: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
 });
 
 module.exports = cliente_info;

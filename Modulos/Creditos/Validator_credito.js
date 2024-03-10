@@ -4,9 +4,10 @@ const Bancos = require("./Model_credito_bancos");
 const Credito_estados = require("./Model_credito_estados");
 const Credito_cotizacion = require("./Model_credito_cotizacion");
 const Creditos = require("./Model_creditos");
+const Credito_pago_cuotas = require("./Model_credito_pago_cuotas");
 const Usuarios = require("../Usuarios/Model_usuario");
 const Cliente = require("../Clientes/Model_cliente");
-
+const Sequelize = require("sequelize");
 
 const input_credito = [
    body('id', "Invalido Credito")
@@ -20,7 +21,11 @@ const input_credito = [
                   if (Exist === null) {
                      reject(new Error("Credito no existe."));
                   } else {
-                     resolve(true);
+                     if( (Exist.id_credito_estado === 5) || (Exist.id_credito_estado === 1) ){
+                        resolve(true);
+                     }else{
+                        reject(new Error("No se permite actualizar un Credito que no este en estado Incompleto o Solicitado"));
+                     }
                   }
                });
             }
@@ -48,9 +53,7 @@ const input_credito = [
       .exists()
       .custom((data, { req }) => {
          return new Promise((resolve, reject) => {
-            if ((req.body.id === '') || (req.body.id === null)){
-               resolve(true);
-            }else{
+            if( req.body.tipo_cobro === 'Transferencia' ){
                Bancos.findOne({ where: { id: data } }).then((Exist) => {
                   if (Exist === null) {
                      reject(new Error("Banco no existe."));
@@ -58,23 +61,8 @@ const input_credito = [
                      resolve(true);
                   }
                });
-            }
-         });
-      }),
-   body("id_usuario_aprueba", "Invalido Usuario")
-      .exists().optional({ nullable: true })
-      .custom( (data, { req }) => {
-         return new Promise((resolve, reject) => {
-            if ((req.body.id === '') || (req.body.id === null)){
-               resolve(true);
             }else{
-               Usuarios.findOne({ where: { id: data } }).then((Exist) => {
-                  if (Exist === null) {
-                     reject(new Error("Usuario no existe."));
-                  } else {
-                     resolve(true);
-                  }
-               });
+               resolve(true);
             }
          });
       }),
@@ -83,17 +71,41 @@ const input_credito = [
       .exists()
       .custom((data) => {
          return new Promise(async (resolve, reject) => {
-            await Cliente.findOne({ where: { id: data } }).then((Exist) => {
+            await Cliente.findOne({ where: { id: data, id_cliente_tipo: 3} }).then((Exist) => {
                if (Exist === null) {
-                  reject(new Error("Cliente no existe."));
+                  reject(new Error("Cliente no existe o no ha sido aprobado."));
                } else {
-                  resolve(true);
+                  Creditos.findOne({ where: { id_cliente: data } }).then((Exist) => {
+                     if ( (Exist.id_credito_estado === 2) || (Exist.id_credito_estado === 3)) {
+                        resolve(true);
+                     } else {
+                        reject(new Error("Tienes un Credito en Proceso, por tanto no puedes solicitar un Nuevo Credito asta estar en paz y salvo"));
+                     }
+                  });
                }
             });
          });
       }),
-   body("valor_credito").isInt().withMessage("Solo se admiten numero enteros"),
-   body('entrega_en_efectivo').isIn(["SI","NO"]).withMessage('Solo es permitido los valores SI y NO'),
+   body("id_credito_cotizacion", "Invalido Cliente")
+      .isInt()
+      .exists()
+      .custom((data) => {
+         return new Promise(async (resolve, reject) => {
+            if ((req.body.id === '') || (req.body.id === null)){
+               await Credito_cotizacion.findOne({ where: { id: data} }).then((Exist) => {
+                  if (Exist === null) {
+                     reject(new Error("Credito Cotizacion no existe."));
+                  } else {
+                     resolve(true);
+                  }
+               });
+            }else{
+               resolve(true);
+            }
+         });
+      }),
+   //body("valor_credito").isInt().withMessage("Solo se admiten numero enteros"),
+   //body('entrega_en_efectivo').isIn(["SI","NO"]).withMessage('Solo es permitido los valores SI y NO'),
    body('tipo_cobro').isIn(["Efectivo","Transferencia"]).withMessage('Solo es permitido los valores Efectivo y Transferencia'),
    body("tipo_cuenta", "Invalido Tipo de Cuenta")
       .exists()
@@ -108,7 +120,6 @@ const input_credito = [
                   reject(new Error('Solo es permitido los valores "Ahorros" y "Corriente"'))
                }
             }else{
-               req.body.tipo_cuenta = '';
                resolve(true)
             }
          });
@@ -128,11 +139,11 @@ const input_credito = [
             }
          });
       }),
-   body('periodicidad_cobro').isIn(["Semanal","Quincenal"]).withMessage('Solo es permitido los valores Semanal y Quincenal'),
-   body("num_cuotas").isInt().withMessage("Solo se admiten numero enteros"),
+   //body('periodicidad_cobro').isIn(["Semanal","Quincenal"]).withMessage('Solo es permitido los valores Semanal y Quincenal'),
+   //body("num_cuotas").isInt().withMessage("Solo se admiten numero enteros"),
    body("nota_cliente").exists().withMessage("No existe el campo nota_cliente"),
-   body('fec_desembolso').optional({ nullable: true, checkFalsy: true  }).isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
-   body('fec_pazysalvo').optional({ nullable: true, checkFalsy: true  }).isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
+   //body('fec_desembolso').optional({ nullable: true, checkFalsy: true  }).isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
+   //body('fec_pazysalvo').optional({ nullable: true, checkFalsy: true  }).isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
 ];
 
 const cotizacion_credito = [
@@ -178,13 +189,48 @@ const input_credito_cotizacion = [
    body('activo').isIn(["SI","NO"]).withMessage('Solo es permitido los valores SI y NO'),
 ];
 
-const update_credito_pagoxcliente = [
-
+const un_credito = [
+   body('id', "Invalido Credito")
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Creditos.findOne({ where: { id: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Credito no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      }),
 ];
+
+const update_credito_pagoxcliente = [
+   body('id', "Invalido Credito")
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Credito_pago_cuotas.findOne({
+               where:{
+                  id: data,
+                  id_credito_pago_estado: { [Sequelize.Op.in]: [1, 4] }
+               }
+            }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Credito pago cuota no existe o tiene un estado distinto a Programado o Cancelado."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      }),
+      body('soporte_pago').notEmpty().withMessage('No se adjunto soporte del pago'),
+]
 
 module.exports = {
    input_credito,
    cotizacion_credito,
    input_credito_cotizacion,
+   un_credito,
    update_credito_pagoxcliente
 };

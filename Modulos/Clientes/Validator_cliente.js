@@ -124,7 +124,7 @@ const input_cliente_info = [
                   if (cliente !== null) {
                      resolve(true);
                   } else {
-                     reject(new Error("Solo se adminten Clientes que esten en estado Nuevo o Imcompleto."));
+                     reject(new Error("El Cliente debe estar en estado Nuevo o Imcompleto."));
                   }
                } else {
                   reject(new Error("Cliente_info ya existe."));
@@ -141,7 +141,6 @@ const input_cliente_info = [
                         id_cliente_tipo: { [Sequelize.Op.in]: [1, 5] }
                      }
                   })
-                  console.log(cliente);
                   if (cliente !== null) {
                      resolve(true);
                   } else {

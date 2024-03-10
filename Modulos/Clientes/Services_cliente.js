@@ -4,7 +4,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 var path = require("path");
-
+const Sequelize = require("sequelize");
 
 const Clientes_tipo = require("./Model_clientes_tipo");
 const Cliente = require("./Model_cliente");
@@ -158,7 +158,7 @@ async function lista_cliente_infoxcliente(id) {
   return ({ successful: true, data: data });
 }
 
-async function input_cliente_info(datos, array_files) {
+async function input_cliente_info(datos) {
 
   var resp = '';
   var data = '';
@@ -191,7 +191,9 @@ async function input_cliente_info(datos, array_files) {
     });
   });
 
-  var titulo = null
+  var titulo = null;
+  var user = null;
+  datos.nota_admin = null;
   try {
     if (datos.id === "" || datos.id === null) {
       titulo = "Creacion ";
@@ -200,7 +202,8 @@ async function input_cliente_info(datos, array_files) {
       // filtro a usuario con menos carga laboral en tres dias 
       const select = `
       SELECT 
-        u.id, 
+        u.id,
+        u.email, 
         IFNULL(cont.contador, 0) AS contador
       FROM users u 
       LEFT JOIN (
@@ -208,8 +211,10 @@ async function input_cliente_info(datos, array_files) {
         INNER JOIN cliente_infos as ci ON  ci.id_cliente = c.id
         WHERE ci.createdAt BETWEEN DATE_SUB(NOW(), INTERVAL 3 DAY) AND NOW()
         GROUP BY c.id_usuario
-      ) AS cont ON cont.id = u.id ORDER BY IFNULL(cont.contador, 0) ASC LIMIT 1`;
-      const user = await Cliente_info.sequelize.query(select, { type: QueryTypes.SELECT });
+      ) AS cont ON cont.id = u.id 
+      where  u.id_user_rol = 1 and u.activo = 'SI' 
+      ORDER BY IFNULL(cont.contador, 0) ASC LIMIT 1`;
+      user = await Cliente_info.sequelize.query(select, { type: QueryTypes.SELECT });
 
       //actualizo usuario encargado
       const cliente = await Cliente.findOne({ where: { id: datos.id_cliente } });
@@ -228,17 +233,37 @@ async function input_cliente_info(datos, array_files) {
 
   resp = await lista_cliente_infoxcliente(data.id_cliente);
 
-  // envio de correo
-  const mensajes = await Config_mensajes.findOne({ where: { id: 1 } });
+  const mensajes = await Config_mensajes.findAll({
+    where:{
+       id: data,
+       id_cliente_tipo: { [Sequelize.Op.in]: [1, 3] }
+    }
+ })
+
+  // envio de correo cliente
   const correo_envia = await Config.findOne({ where: { id: 4 } });
-  const mailOptions = {
+  const mailOptions1 = {
     from: correo_envia.valor_variable,
     to: resp.data[0].email,
-    subject: titulo + mensajes.asunto_mensaje,
-    text: mensajes.mensajes
+    subject: titulo + mensajes[0].asunto_mensaje,
+    text: mensajes[0].mensajes
   };
-  const transporter = await Email.createTransporter();
-  await Email.sendMail(transporter, mailOptions);
+  const transporter1 = await Email.createTransporter();
+  await Email.sendMail(transporter1, mailOptions1);
+
+  // envio de correo admin
+  var text = mensajes[0].asunto_mensaje.replace('||1', titulo);
+  text = mensajes[0].asunto_mensaje.replace('||2', `${ resp.data[0].nombres_cliente } ${ resp.data[0].apellidos_cliente }`);
+  text = mensajes[0].asunto_mensaje.replace('||3', resp.data[0].email);
+  text = mensajes[0].asunto_mensaje.replace('||4', resp.data[0].num_celular);
+  const mailOptions2 = {
+    from: correo_envia.valor_variable,
+    to: user.email,//resp.data[0].email,
+    subject: mensajes[0].asunto_mensaje.replace('||1', titulo),
+    text: text,
+  };
+  const transporter2 = await Email.createTransporter();
+  await Email.sendMail(transporter2, mailOptions2);
 
   return {
     successful: true,
