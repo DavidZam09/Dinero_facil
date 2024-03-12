@@ -14,9 +14,12 @@ module.exports = {
     lista_credito_estados_pago,
     lista_credito_pago,
     update_credito_pagoxcliente,
-    un_credito
+    un_credito,
+    lista_creditosxcliente,
+    create_aprobacion_credito
 };
 
+/////////////////////////////////////////////////////////////////// controladores de los cliente //////////////////////////////////////////////////////////////////
 function lista_bancos(req, res, next) {
     Creditos.lista_bancos().then((respuerta) => {
         return res.send(respuerta);
@@ -112,6 +115,28 @@ function update_credito_pagoxcliente(req, res, next) {
         array_name.push(name_file);
     }
     Creditos.update_credito_pagoxcliente( req.body ).then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+/////////////////////////////////////////////////////////////////// controladores de los admin //////////////////////////////////////////////////////////////////
+function lista_creditosxcliente(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
+    Creditos.lista_creditosxcliente(req.query.id).then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+function create_aprobacion_credito(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
+    
+    Creditos.create_aprobacion_credito( req.body ).then((respuerta) => {
         return res.send(respuerta);
     });
 }

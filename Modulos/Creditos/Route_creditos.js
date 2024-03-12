@@ -5,6 +5,7 @@ var Creditos = require('./Controller_credito');
 const Val  = require('./Validator_credito');
 const Upload_files = require('../../Helpers/Upload_files');
 
+/////////////////////////////////////////////////////////////////// Rutas de los clientes //////////////////////////////////////////////////////////////////
 //rutas creditos
 app.get('/creditos/lista_bancos', Creditos.lista_bancos);
 app.get('/creditos/lista_credito_estados', Creditos.lista_credito_estados);
@@ -24,5 +25,8 @@ app.post('/creditos/update_credito_pagoxcliente',
     Creditos.update_credito_pagoxcliente
 );
 
+/////////////////////////////////////////////////////////////////// Rutas de los admin //////////////////////////////////////////////////////////////////
+app.get('/admin/credito/lista_creditosxcliente', Val.lista_creditosxcliente, Creditos.lista_creditosxcliente);
+app.post('/admin/credito/create_aprobacion_credito', Val.create_aprobacion_credito,  Creditos.create_aprobacion_credito);
 module.exports = app;
 

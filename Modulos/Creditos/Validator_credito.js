@@ -9,6 +9,7 @@ const Usuarios = require("../Usuarios/Model_usuario");
 const Cliente = require("../Clientes/Model_cliente");
 const Sequelize = require("sequelize");
 
+/////////////////////////////////////////////////////////////////// validacion de los admin //////////////////////////////////////////////////////////////////
 const input_credito = [
    body('id', "Invalido Credito")
       .exists()
@@ -27,23 +28,7 @@ const input_credito = [
             }
          });
       }),
-   body("id_credito_estado", "Invalido Estado Credito")
-      .exists().optional({ nullable: true })
-      .custom((data, { req }) => {
-         return new Promise((resolve, reject) => {
-            if ((req.body.id === '') || (req.body.id === null)){
-               resolve(true);
-            }else{
-               Credito_estados.findOne({ where: { id: data } }).then((Exist) => {
-                  if (Exist === null) {
-                     reject(new Error("Estado Credito no existe."));
-                  } else {
-                     resolve(true);
-                  }
-               });
-            }
-         });
-      }),
+   body('id_credito_estado').isIn([ 1, 5 ]).withMessage('Solo es permitido cambiar a los estado Solicitado y Incompleto'),
    body("id_banco", "Invalido Banco")
       .isInt()
       .exists()
@@ -165,7 +150,7 @@ const cotizacion_credito = [
          });
       }),
    check("num_cuotas").isInt({min: 1}).withMessage("Solo se admiten numero enteros mayores a 0"),
-   check('fecha_desembolso').isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
+   check('fec_desembolso').isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
 ];
 
 const input_credito_cotizacion = [
@@ -231,10 +216,47 @@ const update_credito_pagoxcliente = [
       body('soporte_pago').notEmpty().withMessage('No se adjunto soporte del pago'),
 ]
 
+/////////////////////////////////////////////////////////////////// validacion de los admin //////////////////////////////////////////////////////////////////
+const lista_creditosxcliente = [
+   check('id', "Invalido Credito")
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Cliente.findOne({ where: { id: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Cliente no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      }),
+   ];
+
+const create_aprobacion_credito = [
+   body('id', "Invalido Credito")
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Creditos.findOne({ where: { id: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Credito no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      }),
+   body('id_credito_estado').isIn([ 2, 3, 5 ]).withMessage('Solo es permitido cambiar a los Estados Desembolsado, Cancelado, Incompleto'),
+   body("nota_admin").notEmpty().withMessage('campo es nula')
+];
+
 module.exports = {
    input_credito,
    cotizacion_credito,
    input_credito_cotizacion,
    un_credito,
-   update_credito_pagoxcliente
+   update_credito_pagoxcliente,
+   lista_creditosxcliente,
+   create_aprobacion_credito
 };

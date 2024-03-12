@@ -13,6 +13,7 @@ const Credito_pago_cuotas = require("./Model_credito_pago_cuotas");
 const Config = require("../Creditos/Model_config");
 const Config_mensajes = require("../Creditos/Model_config_mensaje");
 const Cliente = require("../Clientes/Model_cliente");
+const { create } = require("domain");
 
 module.exports = {
   lista_bancos,
@@ -25,11 +26,12 @@ module.exports = {
   lista_credito_estados_pago,
   lista_credito_pago,
   update_credito_pagoxcliente,
-  un_credito
+  un_credito,
+  lista_creditosxcliente,
+  create_aprobacion_credito
 };
 
-/* servivios de Creditos */
-
+/////////////////////////////////////////////////////////////////// servivios de los clientes //////////////////////////////////////////////////////////////////
 async function lista_bancos() {
   return { successful: true, data: await Bancos.findAll() };
 }
@@ -73,6 +75,7 @@ async function input_credito(datos) {
     obj.valor_interes = interes;
     obj.valor_interes_mora = interes_mora;
     obj.frecuencia_cobro = frecuencia_cobro;
+    obj.id_credito_estado = datos.id_credito_estado;
   }
 
   if (datos.tipo_cobro === 'Efectivo') {
@@ -81,7 +84,7 @@ async function input_credito(datos) {
     obj.num_cuenta = null;
   }
 
-  var titulo = null; 
+  var titulo = null;
   var data = null;
   try {
     if (datos.id === "" || datos.id === null) {
@@ -143,13 +146,13 @@ async function lista_credito_cotizacion() {
 
 async function cotizacion_credito(req) {
 
-  const { num_cuotas, fecha_desembolso } = req;
+  const { num_cuotas, fec_desembolso } = req;
   const { valor_prestamo, frecuencia_cobro, interes, interes_mora } = await Creditos_cotizacion.findOne({ where: { id: req.id } });
 
   const dias = frecuencia_cobro === 'Semanal' ? 7 : 15;
   var array_cuotas = [];
   var total = null;
-  var fecha_carry = fecha_desembolso;
+  var fecha_carry = fec_desembolso;
 
   for (let index = 0; index < num_cuotas; index++) {
     fecha_carry = new Date(fecha_carry);
@@ -173,7 +176,7 @@ async function cotizacion_credito(req) {
       interes: interes,
       total_pagado: total,
       num_cuotas: num_cuotas,
-      fecha_desembolso: fecha_desembolso,
+      fecha_desembolso: fec_desembolso,
       frecuencia_cobro: frecuencia_cobro,
       cuotas: array_cuotas
     }
@@ -295,5 +298,57 @@ async function update_credito_pagoxcliente(datos) {
   await Email.sendMail(transporter2, mailOptions2);
 
   return lista_credito_pago(null, datos.id);
+
+}
+
+/////////////////////////////////////////////////////////////////// servivios de los admin //////////////////////////////////////////////////////////////////
+
+async function lista_creditosxcliente(id) {
+  var select = `SELECT c.*, ce.id, cb.nombre_credito_bancos FROM creditos AS c
+  INNER JOIN credito_estados AS ce ON ce.id = c.id_credito_estado
+  LEFT JOIN credito_bancos AS cb ON cb.id = c.id_banco
+  WHERE c.id_cliente = ${id}`;
+  var data = await Creditos.sequelize.query(select, { type: QueryTypes.SELECT });
+  return ({ successful: true, data: data });
+}
+
+async function create_aprobacion_credito(datos) {
+
+  var data = await Creditos.findOne({ where: { id: datos.id } });
+
+  // se actualiza pago
+  try {
+    await data.update({
+      id_credito_estado: datos.id_credito_estado,
+      nota_admin: datos.nota_admin,
+      fec_desembolso: parseInt(datos.id_credito_estado) === 2 ? moment().format('YYYY-MM-DD') : null
+    });
+  } catch (error) {
+    return {
+      successful: false,
+      data: "Error Al intentar Guardar en base de datos",
+    };
+  }
+
+  if (parseInt(datos.id_credito_estado) === 2) {
+    const resp = await cotizacion_credito(data);
+    var obj = null;
+    var array = [];
+    resp.data.forEach(ele => {
+      obj = {
+        id_credito: datos.id,
+        id_credito_pago_estado: 1,
+        num_pago: ele.n_cuota,
+        fecha_estimada_pago: ele.fecha_pago_cuota,
+        fecha_pago: null,
+        valor_pagado: null,
+        soporte_pago: null,
+        nota_admin: null
+      };
+      array.push(obj);
+    });
+    await Credito_pago_cuotas.bulkCreate(array);
+  }
+
 
 }

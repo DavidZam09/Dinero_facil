@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
 var path = require("path");
+const moment = require('moment');
 
 const Clientes_tipo = require("./Model_clientes_tipo");
 const Cliente = require("./Model_cliente");
@@ -36,7 +37,16 @@ module.exports = {
 };
 
 /////////////////////////////////////////////////////////////////// Servicios de los Admin //////////////////////////////////////////////////////////////////
-async function lista_clientesxadmin(id) {
+async function lista_clientesxadmin(id_user, id_cliente_info) {
+
+  var where = null;
+  if( id_user !== null){
+    where = ` WHERE c.id_usuario = ${id_user}`;
+  }
+  if( id_cliente_info !== null){
+    where = ` WHERE ci.id = ${id_cliente_info}`;
+  }
+
   var select = `SELECT ci.*, c.num_celular, c.email, ct.nombre_tipo_cliente, 
   utd.nombre_tipo_doc, cae.nombre_actividad_eco, cse.nombre_sector_eco
   FROM cliente_infos AS ci
@@ -45,27 +55,45 @@ async function lista_clientesxadmin(id) {
   INNER JOIN cliente_sector_ecos AS cse ON  ci.id_cliente_sector_eco = cse.id
   INNER JOIN clientes AS c ON ci.id_cliente = ci.id_cliente = c.id
   INNER JOIN users AS u ON c.id_usuario = u.id
-  inner JOIN cliente_tipos AS ct on c.id_cliente_tipo = ct.id
-  WHERE c.id = ${id}`;
+  inner JOIN cliente_tipos AS ct on c.id_cliente_tipo = ct.id ${where}`;
   var data = await User.sequelize.query(select, { type: QueryTypes.SELECT });
   return ({ successful: true, data: data });
 }
 
-async function update_aprobacion_cliente(id) {
-  var select = `SELECT ci.*, c.num_celular, c.email, ct.nombre_tipo_cliente, 
-  utd.nombre_tipo_doc, cae.nombre_actividad_eco, cse.nombre_sector_eco
-  FROM cliente_infos AS ci
-  INNER JOIN user_tipo_docs AS utd ON  ci.id_user_tipo_doc = utd.id
-  INNER JOIN cliente_actividad_ecos AS cae ON  ci.id_cliente_actividad_eco = cae.id
-  INNER JOIN cliente_sector_ecos AS cse ON  ci.id_cliente_sector_eco = cse.id
-  INNER JOIN clientes AS c ON ci.id_cliente = ci.id_cliente = c.id
-  INNER JOIN users AS u ON c.id_usuario = u.id
-  inner JOIN cliente_tipos AS ct on c.id_cliente_tipo = ct.id
-  WHERE c.id = ${id}`;
-  var data = await User.sequelize.query(select, { type: QueryTypes.SELECT });
-  return ({ successful: true, data: data });
-}
+async function update_aprobacion_cliente( req ) {
+  try {
+    var cliente_info  = await Cliente_info.findOne({ where: { id: req.id } });
+    await cliente_info.update({
+      nota_admin: req.nota_admin
+    });
 
+    var cliente  = await Cliente.findOne({ where: { id: cliente_info.id_cliente } });
+    await cliente.update({
+      fecha_aprobacion: parseInt( req.id_cliente_tipo ) == 2 ? moment().format('YYYY-MM-DD') : null,
+      id_cliente_tipo: req.id_cliente_tipo,
+    });
+  } catch (error) {
+    console.log(error);
+    return { successful: false, error: error };
+  }
+
+  const resp = await lista_clientesxadmin(null, req.id);
+
+  // envio de correo cliente
+  const mensajes = await Config_mensajes.findAll({ where:{ id: 8 } });
+  const correo_envia = await Config.findOne({ where: { id: 4 } });
+
+  const mailOptions1 = {
+    from: correo_envia.valor_variable,
+    to: resp.data[0].email,
+    subject: mensajes[0].asunto_mensaje,
+    text: mensajes[0].mensaje.replace('||1', resp.data[0].nombre_tipo_cliente )
+  };
+  const transporter1 = await Email.createTransporter( mensajes[0].nombre_tipo_cliente);
+  await Email.sendMail(transporter1, mailOptions1);
+
+  return resp;
+}
 
 /////////////////////////////////////////////////////////////////// Servicios de los clientes //////////////////////////////////////////////////////////////////
 

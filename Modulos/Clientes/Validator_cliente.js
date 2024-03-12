@@ -236,21 +236,55 @@ const lista_clientesxadmin = [
    ];
 
    const update_aprobacion_cliente = [
-      check("id", "Invalido Usuario")
+      body("id", "Invalido Usuario")
          .isInt()
          .exists()
          .custom((data) => {
             return new Promise((resolve, reject) => {
-               User.findOne({ where: { id: data } }).then((Exist) => {
+               Cliente_info.findOne({ where: { id: data } }).then((Exist) => {
                   if (Exist === null) {
-                     reject(new Error("Usuario no existe."));
+                     reject(new Error("Cliente info no existe."));
                   } else {
-                     resolve(true);
+                     Cliente.findOne({ where: { id: Exist.id_cliente } }).then(async (data) => {
+                        if (data === null) {
+                           reject(new Error("Cliente no existe."));
+                        } if (data === null) {
+                           reject(new Error("Cliente info no datae."));
+                        }if ( parseInt(data.id_cliente_tipo) ===  1 ) {
+                           resolve(true);
+                        }if ( parseInt(data.id_cliente_tipo) ===  2 ) {
+                           reject(new Error("No se puede modificar el estado de un cliente Aprobado"));
+                        }if ( parseInt(data.id_cliente_tipo) ===  3 ) {
+                           reject(new Error("No se puede modificar el estado de un cliente No Apto"));
+                        }if ( parseInt(data.id_cliente_tipo) ===  4 ) {
+                           resolve(true);
+                        }
+                     });
                   }
                });
+               /*Cliente.findOne({ where: { id: data } }).then(async (Exist) => {
+                  if (Exist === null) {
+                     reject(new Error("Cliente no existe."));
+                  } else {
+                     var data = await Cliente_info.findOne({ where: { id_cliente: data } });
+                     if (data === null) {
+                        reject(new Error("Cliente info no datae."));
+                     }if ( parseInt(data.id_cliente_tipo) ===  1 ) {
+                        resolve(true);
+                     }if ( parseInt(data.id_cliente_tipo) ===  2 ) {
+                        reject(new Error("No se puede modificar el estado de un cliente Aprobado"));
+                     }if ( parseInt(data.id_cliente_tipo) ===  3 ) {
+                        reject(new Error("No se puede modificar el estado de un cliente No Apto"));
+                     }if ( parseInt(data.id_cliente_tipo) ===  4 ) {
+                        resolve(true);
+                     }
+                  }
+               });*/
             });
          }),
-      ];
+      body("nota_admin").notEmpty().withMessage('variable es nula'),
+      body('id_cliente_tipo').isIn([ 2, 3, 4 ]).withMessage('Solo es permitido cambiar a los estado Aprobado, Incompleto, No apto'),
+   ];
 
 module.exports = {
    registrar_cliente,
