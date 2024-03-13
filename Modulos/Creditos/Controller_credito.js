@@ -16,7 +16,8 @@ module.exports = {
     update_credito_pagoxcliente,
     un_credito,
     lista_creditosxcliente,
-    create_aprobacion_credito
+    create_aprobacion_credito,
+    lista_pago_cuotasxuser
 };
 
 /////////////////////////////////////////////////////////////////// controladores de los cliente //////////////////////////////////////////////////////////////////
@@ -137,6 +138,16 @@ function create_aprobacion_credito(req, res, next) {
     }
     
     Creditos.create_aprobacion_credito( req.body ).then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+function lista_pago_cuotasxuser(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
+    Creditos.lista_pago_cuotasxuser(req.query.id).then((respuerta) => {
         return res.send(respuerta);
     });
 }

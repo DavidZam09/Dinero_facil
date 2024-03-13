@@ -195,8 +195,8 @@ const input_cliente_info = [
             })
       })
    }),
-   body("id_dpto").isInt().withMessage("Solo se admiten numero enteros"),
-   body("id_ciudad").isInt().withMessage("Solo se admiten numero enteros"),
+   body("dpto").notEmpty().withMessage('variable no existe o es nula'),
+   body("ciudad").notEmpty().withMessage('variable no existe o es nula'),
    body('nombres_cliente').notEmpty().withMessage('variable no existe o es nula'),
    body('apellidos_cliente').notEmpty().withMessage('variable no existe o es nula'),
    body('fecha_nac').notEmpty().isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),

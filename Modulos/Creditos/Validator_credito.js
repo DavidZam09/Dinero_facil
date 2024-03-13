@@ -242,13 +242,33 @@ const create_aprobacion_credito = [
                if (Exist === null) {
                   reject(new Error("Credito no existe."));
                } else {
-                  resolve(true);
+                  if( (Exist.id_credito_estado === 2) || (Exist.id_credito_estado === 3) || (Exist.id_credito_estado === 4) ){
+                     reject(new Error("No se puede Editar un credito en estado Desembolsado,  Cancelado, Paz&Salvo"));
+                  }else{
+                     resolve(true);
+                  }
                }
             });
          });
       }),
-   body('id_credito_estado').isIn([ 2, 3, 5 ]).withMessage('Solo es permitido cambiar a los Estados Desembolsado, Cancelado, Incompleto'),
+   body('id_credito_estado').isIn([2, 3, 5 ]).withMessage('Solo es permitido cambiar a los Estados Desembolsado, Cancelado, Incompleto'),
    body("nota_admin").notEmpty().withMessage('campo es nula')
+];
+
+const lista_pago_cuotasxuser = [
+   body('id', "Invalido Credito")
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Usuarios.findOne({ where: { id: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Usuario no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      })
 ];
 
 module.exports = {
@@ -258,5 +278,6 @@ module.exports = {
    un_credito,
    update_credito_pagoxcliente,
    lista_creditosxcliente,
-   create_aprobacion_credito
+   create_aprobacion_credito,
+   lista_pago_cuotasxuser
 };

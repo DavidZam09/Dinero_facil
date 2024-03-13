@@ -15,11 +15,11 @@ const cliente_info = sequelize.define("cliente_info", {
         key: 'id'
     }
   },
-  id_dpto: {
+  dpto: {
     type: DataTypes.STRING,
     allowNull: false,
   },  
-  id_ciudad: {
+  ciudad: {
     type: DataTypes.STRING,
     allowNull: false,
   },

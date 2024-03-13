@@ -2,6 +2,7 @@ const sequelize = require("../../Helpers/Config_db");
 const { DataTypes } = require("sequelize");
 const Credito = require('./Model_creditos');
 const Credito_pago_estados = require('./Model_credito_pago_estados');
+const User = require('../Usuarios/Model_usuario');
 
 const Credito_pago_cuotas = sequelize.define("credito_pago_cuotas", {
   id_credito: {
@@ -17,6 +18,14 @@ const Credito_pago_cuotas = sequelize.define("credito_pago_cuotas", {
     allowNull: false,
         references: {
         model: Credito_pago_estados,
+        key: 'id'
+    }
+  },
+  id_user_cobra: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+        references: {
+        model: User,
         key: 'id'
     }
   }, 

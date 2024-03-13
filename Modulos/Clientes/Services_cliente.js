@@ -89,7 +89,7 @@ async function update_aprobacion_cliente( req ) {
     subject: mensajes[0].asunto_mensaje,
     text: mensajes[0].mensaje.replace('||1', resp.data[0].nombre_tipo_cliente )
   };
-  const transporter1 = await Email.createTransporter( mensajes[0].nombre_tipo_cliente);
+  const transporter1 = await Email.createTransporter();
   await Email.sendMail(transporter1, mailOptions1);
 
   return resp;

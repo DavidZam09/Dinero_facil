@@ -13,7 +13,6 @@ const Credito_pago_cuotas = require("./Model_credito_pago_cuotas");
 const Config = require("../Creditos/Model_config");
 const Config_mensajes = require("../Creditos/Model_config_mensaje");
 const Cliente = require("../Clientes/Model_cliente");
-const { create } = require("domain");
 
 module.exports = {
   lista_bancos,
@@ -28,7 +27,8 @@ module.exports = {
   update_credito_pagoxcliente,
   un_credito,
   lista_creditosxcliente,
-  create_aprobacion_credito
+  create_aprobacion_credito,
+  lista_pago_cuotasxuser
 };
 
 /////////////////////////////////////////////////////////////////// servivios de los clientes //////////////////////////////////////////////////////////////////
@@ -49,7 +49,6 @@ async function un_credito(id) {
   INNER  JOIN cliente_infos AS ci ON ci.id_cliente = c.id_cliente
   INNER  JOIN clientes AS c2 ON c2.id = c.id_cliente
   WHERE c.id = ${id} LIMIT 1`;
-  console.log(select);
   var data = await Creditos.sequelize.query(select, { type: QueryTypes.SELECT });
   return ({ successful: true, data: data });
 }
@@ -330,14 +329,22 @@ async function create_aprobacion_credito(datos) {
     };
   }
 
+  var select = `SELECT cc.email, ce.nombre_credito_tipo, cc.id_usuario FROM creditos AS c
+  INNER JOIN clientes AS cc ON c.id_cliente = cc.id
+  INNER JOIN credito_estados as ce ON ce.id =c.id_credito_estado
+  WHERE c.id = ${datos.id} LIMIT 1`;
+  const consl = await Creditos.sequelize.query(select, { type: QueryTypes.SELECT });
+
+  //credo data y almaceno creando Credito_pago_cuotas
   if (parseInt(datos.id_credito_estado) === 2) {
     const resp = await cotizacion_credito(data);
     var obj = null;
     var array = [];
-    resp.data.forEach(ele => {
+    resp.data.cuotas.forEach(ele => {
       obj = {
         id_credito: datos.id,
         id_credito_pago_estado: 1,
+        id_user_cobra: data.tipo_cobro=='Transferencia'?consl[0].id_usuario:null,
         num_pago: ele.n_cuota,
         fecha_estimada_pago: ele.fecha_pago_cuota,
         fecha_pago: null,
@@ -350,5 +357,64 @@ async function create_aprobacion_credito(datos) {
     await Credito_pago_cuotas.bulkCreate(array);
   }
 
+  //consulta data para envai correo
+  const mensajes = await Config_mensajes.findOne({ where:{ id: 9 } });
+  const correo_envia = await Config.findOne({ where: { id: 4 } });
+
+  //creo correo y lo envio
+  const mailOptions = {
+    from: correo_envia.valor_variable,
+    to: consl[0].email,
+    subject: mensajes.asunto_mensaje,
+    text: mensajes.mensaje.replace('||1', consl[0].nombre_credito_tipo)
+  };
+  const transporter = await Email.createTransporter();
+  await Email.sendMail(transporter, mailOptions);
+    
+  return ({ successful: false, data: data });
+}
+
+async function lista_pago_cuotasxuser(id) {
+  var select1 = `SELECT 
+	  cc.id AS id_credito,
+    c.id,
+    c.email,
+    c.num_celular,
+    ci.dpto,
+    ci.ciudad,
+    CONCAT(ci.nombres_cliente, " ", ci.apellidos_cliente) AS nom_completo,
+    ci.direccion,
+    num_documento,
+    utd.nombre_tipo_doc,
+    ci.fecha_nac,
+    ci.foto_cliente,
+    ct.nombre_tipo_cliente,
+    ce.nombre_credito_tipo,
+    cc.num_cuenta,
+    cc.tipo_cobro,
+    cc.num_cuotas,
+    cc.valor_credito,
+    cc.valor_interes,
+    cc.valor_interes_mora,
+    cc.frecuencia_cobro,
+    cc.fec_desembolso,
+    cb.nombre_credito_bancos
+  FROM clientes AS c
+  INNER JOIN cliente_infos AS ci ON c.id = ci.id_cliente
+  INNER JOIN user_tipo_docs AS utd ON utd.id = ci.id_user_tipo_doc
+  INNER JOIN cliente_tipos AS ct ON ct.id = c.id_cliente_tipo
+  INNER JOIN creditos AS cc ON c.id = cc.id_cliente
+  INNER JOIN credito_estados AS ce ON ce.id = cc.id_credito_estado
+  INNER JOIN credito_bancos AS cb ON cb.id = cc.id_banco
+  WHERE c.id_cliente_tipo = 2 AND 
+  cc.id_credito_estado = 2 AND 
+  c.id_usuario = ${id}`;
+  const cliente_array = await Creditos.sequelize.query(select1, { type: QueryTypes.SELECT });
+
+  var select1 = `SELECT cpe.nombre_estado_pago, cpc.* FROM credito_pago_cuotas AS cpc 
+  INNER JOIN credito_pago_estados AS cpe ON cpc.id_credito_pago_estado = cpe.id
+  INNER JOIN creditos AS c ON c.id = cpc.id_credito
+  WHERE cpc.id_user_cobra = ${id}`;
+  const pagos_cuotas = await Creditos.sequelize.query(select1, { type: QueryTypes.SELECT });
 
 }
