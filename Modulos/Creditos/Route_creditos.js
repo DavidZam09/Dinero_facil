@@ -30,6 +30,7 @@ app.get('/admin/credito/lista_creditosxcliente', Val.lista_creditosxcliente, Cre
 app.post('/admin/credito/create_aprobacion_credito', Val.create_aprobacion_credito,  Creditos.create_aprobacion_credito);
 
 app.get('/admin/pago_cuota/lista_pago_cuotasxuser', Val.lista_pago_cuotasxuser, Creditos.lista_pago_cuotasxuser);
+app.post('/admin/pago_cuota/update_aprobacion_pago_cuotaxadmin', Val.update_aprobacion_pago_cuotaxadmin,  Creditos.update_aprobacion_pago_cuotaxadmin);
 
 module.exports = app;
 

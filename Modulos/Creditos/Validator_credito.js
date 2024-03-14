@@ -256,7 +256,7 @@ const create_aprobacion_credito = [
 ];
 
 const lista_pago_cuotasxuser = [
-   body('id', "Invalido Credito")
+   check('id', "Invalido Credito")
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {
@@ -269,7 +269,29 @@ const lista_pago_cuotasxuser = [
             });
          });
       })
-];
+   ];
+
+const update_aprobacion_pago_cuotaxadmin = [
+   body('id', "Invalido Pago Cuota")
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Credito_pago_cuotas.findOne({ where: { id: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Pago Cuota no existe."));
+               } else {
+                  if( parseInt( Exist.id_credito_pago_estado ) === 3){
+                     reject(new Error("No se puede modificar un estado Apobado."));
+                  }else{
+                     resolve(true);
+                  }
+               }
+            });
+         });
+      }),
+   body('id_credito_pago_estado').isIn([ 3, 4 ]).withMessage('Solo es permitido cambiar a los Estados Aprobado o Cancelado'),
+   body("nota_admin").notEmpty().withMessage('campo es nula')
+   ];
 
 module.exports = {
    input_credito,
@@ -279,5 +301,6 @@ module.exports = {
    update_credito_pagoxcliente,
    lista_creditosxcliente,
    create_aprobacion_credito,
-   lista_pago_cuotasxuser
+   lista_pago_cuotasxuser,
+   update_aprobacion_pago_cuotaxadmin
 };

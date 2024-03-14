@@ -5,6 +5,9 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 require('dotenv').config();
 
+const cron = require('node-cron');
+const Task = require("./Helpers/Cron");
+
 var app = express();
 require("./Helpers/Config_db");
 
@@ -18,10 +21,26 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(function (req, res, next) {
+  // 👇️ specify CORS headers to send 👇️
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header(
+    'Access-Control-Allow-Methods',
+    'POST, PUT, PATCH, GET, DELETE, OPTIONS',
+  );
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Api-Key, X-Requested-With, Content-Type, Accept, Authorization',
+  );
+  next();
+});
+
 app.get('/', function(req, res, next) { res.render('index', { title: 'Express' }); });
 app.use(require('./Modulos/Usuarios/Route_usuario'));
 app.use(require('./Modulos/Clientes/Route_cliente'));
 app.use(require('./Modulos/Creditos/Route_creditos'));
+
+cron.schedule('0 8 * * *', Task.task);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -28,7 +28,8 @@ module.exports = {
   un_credito,
   lista_creditosxcliente,
   create_aprobacion_credito,
-  lista_pago_cuotasxuser
+  lista_pago_cuotasxuser,
+  update_aprobacion_pago_cuotaxadmin
 };
 
 /////////////////////////////////////////////////////////////////// servivios de los clientes //////////////////////////////////////////////////////////////////
@@ -371,7 +372,7 @@ async function create_aprobacion_credito(datos) {
   const transporter = await Email.createTransporter();
   await Email.sendMail(transporter, mailOptions);
     
-  return ({ successful: false, data: data });
+  return ({ successful: true, data: data });
 }
 
 async function lista_pago_cuotasxuser(id) {
@@ -417,4 +418,90 @@ async function lista_pago_cuotasxuser(id) {
   WHERE cpc.id_user_cobra = ${id}`;
   const pagos_cuotas = await Creditos.sequelize.query(select1, { type: QueryTypes.SELECT });
 
+  var array1 = [];
+  var array2 = [];
+
+  cliente_array.forEach(ele1 => {
+    pagos_cuotas.forEach(ele2 => {
+      if( parseInt(ele1.id_credito) === parseInt(ele2.id_credito) ){
+        array2.push(ele2);
+      }
+    });
+    ele1.pago_cuotas = array2;
+    array1.push(ele1);
+  });
+
+  return ({ successful: false, data: array1 });
+}
+
+async function update_aprobacion_pago_cuotaxadmin(datos) {
+
+  var data = await Credito_pago_cuotas.findOne({ where: { id: datos.id } });
+  const credito = await Creditos.findOne({ where: { id: data.id_credito } });
+  var val_pagado = null
+  if( parseInt( datos.id_credito_pago_estado ) === 3){
+    val_pagado = (credito.valor_credito / credito.num_cuotas) + credito.valor_interes;
+    if( moment().format('YYYY-MM-DD') > data.fecha_estimada_pago ){
+      val_pagado += credito.valor_interes_mora;
+    }
+  }
+
+  // se actualiza pago cuotas
+  try {
+    data = await data.update({
+      id: datos.id,
+      valor_pagado: val_pagado,
+      id_credito_pago_estado: datos.id_credito_pago_estado,
+      nota_admin: datos.nota_admin
+    });
+  } catch (error) {
+    return {
+      successful: false,
+      data: "Error Al intentar Guardar en base de datos",
+    };
+  }
+
+  //data envio correo
+  const estado = await Credito_pago_estados.findOne({ where: { id: datos.id_credito_pago_estado } });
+  const resp = await un_credito(data.id_credito);
+  const correo_envia = await Config.findOne({ where: { id: 4 } });
+  const mensajes = await Config_mensajes.findAll({
+    where: { id: { [Op.in]: [10, 11] }  }
+  })
+
+  //envio notificacion cliente pago credito 
+  const mailOptions1 = {
+    from: correo_envia.valor_variable,
+    to: resp.data[0].email,
+    subject: mensajes[0].asunto_mensaje,
+    text: mensajes[0].mensaje.replace('||1', data.num_pago).replace('||2', estado.nombre_estado_pago)
+  };
+  const transporter1 = await Email.createTransporter();
+  await Email.sendMail(transporter1, mailOptions1);
+
+  // cambio estado de credito y envio mensaje
+  const PazSalvo = await Credito_pago_cuotas.findAll({ where: { id_credito: data.id_credito, id_credito_pago_estado: 3} });
+  if( (PazSalvo.length === parseInt( data.num_pago ) )){
+    try {
+      await credito.update({ id_credito_estado: 4 });
+    } catch (error) {
+      return {
+        successful: false,
+        data: "Error Al intentar Guardar en base de datos",
+      };
+    }
+
+    // envio mensage de pas y salvo
+    const mailOptions2 = {
+      from: correo_envia.valor_variable,
+      to: resp.data[0].email,
+      subject: mensajes[1].asunto_mensaje,
+      text: mensajes[1].mensaje
+    };
+    const transporter2 = await Email.createTransporter();
+    await Email.sendMail(transporter2, mailOptions2);
+
+  }
+
+  return ({ successful: false, data: data });
 }
