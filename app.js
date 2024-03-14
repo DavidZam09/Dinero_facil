@@ -40,7 +40,7 @@ app.use(require('./Modulos/Usuarios/Route_usuario'));
 app.use(require('./Modulos/Clientes/Route_cliente'));
 app.use(require('./Modulos/Creditos/Route_creditos'));
 
-cron.schedule('0 8 * * *', Task.task);
+cron.schedule('33 12 * * *', Task.test);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

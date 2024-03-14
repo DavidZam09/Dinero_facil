@@ -1,6 +1,6 @@
 -- Volcando estructura de base de datos para dinero_facil
 CREATE DATABASE IF NOT EXISTS `dinero_facil` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
-USE `dinero_facil`;
+USE `dinero_facil2`;
 
 -- Volcando estructura para tabla dinero_facil.credito_cotizacions
 CREATE TABLE IF NOT EXISTS `credito_cotizacions` (
@@ -323,8 +323,8 @@ INSERT INTO `users` (`id`, `id_user_tipo_doc`, `id_user_rol`, `nombre_completo`,
 CREATE TABLE IF NOT EXISTS `cliente_infos` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `id_cliente` bigint(20) unsigned NOT NULL,
-  `dpto` bigint(20) NOT NULL,
-  `ciudad` bigint(20) NOT NULL,
+  `dpto` varchar(100) NOT NULL,
+  `ciudad` varchar(100) NOT NULL,
   `id_user_tipo_doc` bigint(20) unsigned NOT NULL,
   `id_cliente_actividad_eco` bigint(20) unsigned NOT NULL,
   `id_cliente_sector_eco` bigint(20) unsigned NOT NULL,
