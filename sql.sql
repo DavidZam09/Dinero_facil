@@ -17,7 +17,7 @@
 
 -- Volcando estructura de base de datos para dinero_facil
 CREATE DATABASE IF NOT EXISTS `dinero_facil` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci */;
-USE `dinero_facil`;
+USE `dinero_facil2`;
 
 -- Volcando estructura para tabla dinero_facil.clientes
 CREATE TABLE IF NOT EXISTS `clientes` (
@@ -457,8 +457,145 @@ INSERT INTO `user_tipo_docs` (`id`, `nombre_tipo_doc`, `createdAt`, `updatedAt`)
 	(2, 'N.I.T', '2024-02-05 01:41:03', '2024-02-05 01:40:19'),
 	(3, 'Pasaporte', '2024-02-05 01:41:01', '2024-02-05 01:40:48');
 
-/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+-- Volcando estructura para tabla dinero_facil.clientes
+CREATE TABLE IF NOT EXISTS `clientes` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_cliente_tipo` bigint(20) unsigned NOT NULL,
+  `id_usuario` bigint(20) unsigned DEFAULT NULL,
+  `email` varchar(100) NOT NULL,
+  `num_celular` bigint(20) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `cod_referido` varchar(20) DEFAULT NULL,
+  `cod_personal` varchar(20) NOT NULL,
+  `fecha_aprobacion` date DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  UNIQUE KEY `cod_personal` (`cod_personal`),
+  UNIQUE KEY `num_celular` (`num_celular`),
+  KEY `FK1_id_cliente_tipo` (`id_cliente_tipo`),
+  KEY `FK1_id_usuario` (`id_usuario`),
+  CONSTRAINT `FK1_id_cliente_tipo` FOREIGN KEY (`id_cliente_tipo`) REFERENCES `cliente_tipos` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK1_id_usuario` FOREIGN KEY (`id_usuario`) REFERENCES `users` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando estructura para tabla dinero_facil.users
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_user_tipo_doc` bigint(20) unsigned NOT NULL,
+  `id_user_rol` bigint(20) unsigned NOT NULL,
+  `nombre_completo` varchar(100) NOT NULL,
+  `password` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `num_celular` bigint(20) NOT NULL,
+  `num_doc` varchar(20) NOT NULL,
+  `direccion` varchar(200) NOT NULL,
+  `activo` varchar(2) NOT NULL DEFAULT 'SI',
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `FK1_id_user_tipo_doc` (`id_user_tipo_doc`),
+  KEY `FK1_id_user_rol` (`id_user_rol`),
+  CONSTRAINT `FK1_id_user_rol` FOREIGN KEY (`id_user_rol`) REFERENCES `user_rols` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK1_id_user_tipo_doc` FOREIGN KEY (`id_user_tipo_doc`) REFERENCES `user_tipo_docs` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `users` (`id`, `id_user_tipo_doc`, `id_user_rol`, `nombre_completo`, `password`, `email`, `num_celular`, `num_doc`, `direccion`, `activo`, `createdAt`, `updatedAt`) VALUES 
+(1, 1, 1, 'Admin', '$2b$10$YE26LrNqyP8iVzoB1D308OVdKsyeZq7r6GpI.7SNomfolZo9JkXLy', 'admin@gmail.com', 123456789, '12121212', 'callle 12 # 12 -12', 'SI', '2024-03-09 21:42:38', '2024-03-09 21:42:38');
+
+-- Volcando estructura para tabla dinero_facil.cliente_infos
+CREATE TABLE IF NOT EXISTS `cliente_infos` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_cliente` bigint(20) unsigned NOT NULL,
+  `dpto` bigint(20) NOT NULL,
+  `ciudad` bigint(20) NOT NULL,
+  `id_user_tipo_doc` bigint(20) unsigned NOT NULL,
+  `id_cliente_actividad_eco` bigint(20) unsigned NOT NULL,
+  `id_cliente_sector_eco` bigint(20) unsigned NOT NULL,
+  `nombres_cliente` varchar(100) NOT NULL,
+  `apellidos_cliente` varchar(100) NOT NULL,
+  `fecha_nac` date NOT NULL,
+  `fecha_aprobacion` date DEFAULT NULL,
+  `direccion` varchar(100) NOT NULL,
+  `num_documento` varchar(20) NOT NULL,
+  `otro_sector_y_actividad` varchar(100) DEFAULT NULL,
+  `nombre_empresa_labora` varchar(50) NOT NULL,
+  `ingreso_mesual` bigint(20) NOT NULL,
+  `gasto_mensual` bigint(20) NOT NULL,
+  `foto_cliente` varchar(100) NOT NULL,
+  `foto_doc_frontal` varchar(100) NOT NULL,
+  `foto_doc_trasera` varchar(100) NOT NULL,
+  `foto_recivo_publico` varchar(100) DEFAULT NULL,
+  `foto_pago_nomina` varchar(100) DEFAULT NULL,
+  `tratamiento_datos` tinyint(4) NOT NULL DEFAULT 1,
+  `terminos_y_condiciones` tinyint(4) NOT NULL DEFAULT 1,
+  `rf1_nombre_completo` varchar(100) NOT NULL,
+  `rf1_num_celular` varchar(20) NOT NULL,
+  `rf1_direccion` varchar(100) NOT NULL,
+  `rf2_nombre_completo` varchar(100) NOT NULL,
+  `rf2_num_celular` varchar(20) NOT NULL,
+  `rf2_direccion` varchar(100) NOT NULL,
+  `nota_admin` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `FK2_id_user_tipo_doc` (`id_user_tipo_doc`),
+  KEY `FK1_id_cliente_actividad_eco` (`id_cliente_actividad_eco`),
+  KEY `FK1_id_cliente_sector_eco` (`id_cliente_sector_eco`),
+  KEY `FK1_id_cliente` (`id_cliente`),
+  CONSTRAINT `FK1_id_cliente` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK1_id_cliente_actividad_eco` FOREIGN KEY (`id_cliente_actividad_eco`) REFERENCES `cliente_actividad_ecos` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK1_id_cliente_sector_eco` FOREIGN KEY (`id_cliente_sector_eco`) REFERENCES `cliente_sector_ecos` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK2_id_user_tipo_doc` FOREIGN KEY (`id_user_tipo_doc`) REFERENCES `user_tipo_docs` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando estructura para tabla dinero_facil.creditos
+CREATE TABLE IF NOT EXISTS `creditos` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_credito_estado` bigint(20) unsigned NOT NULL DEFAULT 1,
+  `id_banco` bigint(20) unsigned DEFAULT NULL,
+  `id_cliente` bigint(20) unsigned NOT NULL,
+  `nota_cliente` text DEFAULT NULL,
+  `tipo_cobro` varchar(20) NOT NULL,
+  `num_cuenta` varchar(20) DEFAULT NULL,
+  `tipo_cuenta` varchar(20) DEFAULT NULL,
+  `num_cuotas` bigint(20) unsigned NOT NULL,
+  `valor_credito` bigint(20) unsigned NOT NULL,
+  `valor_interes` bigint(20) unsigned NOT NULL,
+  `valor_interes_mora` bigint(20) unsigned NOT NULL,
+  `frecuencia_cobro` varchar(20) NOT NULL,
+  `fec_desembolso` date DEFAULT NULL,
+  `fec_pazysalvo` date DEFAULT NULL,
+  `nota_admin` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `FK1_id_banco` (`id_banco`),
+  KEY `FK1_id_credito_estado` (`id_credito_estado`),
+  KEY `FK2_id_cliente` (`id_cliente`),
+  CONSTRAINT `FK1_id_banco` FOREIGN KEY (`id_banco`) REFERENCES `credito_bancos` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK1_id_credito_estado` FOREIGN KEY (`id_credito_estado`) REFERENCES `credito_estados` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK2_id_cliente` FOREIGN KEY (`id_cliente`) REFERENCES `clientes` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- Volcando estructura para tabla dinero_facil.credito_pago_cuotas
+CREATE TABLE IF NOT EXISTS `credito_pago_cuotas` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `id_credito` bigint(20) unsigned NOT NULL,
+  `id_credito_pago_estado` bigint(20) unsigned NOT NULL,
+  `num_pago` bigint(20) unsigned NOT NULL,
+  `fecha_estimada_pago` date NOT NULL,
+  `fecha_pago` date DEFAULT NULL,
+  `valor_pagado` bigint(20) DEFAULT NULL,
+  `soporte_pago` varchar(100) DEFAULT NULL,
+  `nota_admin` text DEFAULT NULL,
+  `createdAt` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updatedAt` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  KEY `FK1_id_credito` (`id_credito`),
+  KEY `FK1_id_credito_pago_estado` (`id_credito_pago_estado`),
+  CONSTRAINT `FK1_id_credito` FOREIGN KEY (`id_credito`) REFERENCES `creditos` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `FK1_id_credito_pago_estado` FOREIGN KEY (`id_credito_pago_estado`) REFERENCES `credito_pago_estados` (`id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
