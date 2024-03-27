@@ -1,6 +1,7 @@
 const { validationResult } = require("express-validator");
 const fs = require("fs");
 var path = require("path");
+
 const Cliente = require("./Services_cliente");
 
 module.exports = {
@@ -14,10 +15,29 @@ module.exports = {
     input_cliente_info,
     borrarContenidoCarpeta,
     lista_clientesxadmin,
-    update_aprobacion_cliente
+    update_aprobacion_cliente,
+    get_doc
 };
 
 /////////////////////////////////////////////////////////////////// Controlador para los Admin //////////////////////////////////////////////////////////////////
+function get_doc(req, res, next) {
+
+    const dir = `../../uploads${req.query.doc}`;
+    uploadDir = path.join(__dirname, dir);
+
+    if (!fs.existsSync(uploadDir)) {
+        res.json({ successful: false, data: "El Documento no existe" });
+    }
+
+    res.download(path.resolve(uploadDir), function(err) {
+        if(err) {
+            console.log(err);
+        }else{
+            console.log('Download Completed');
+        }
+    })
+}
+
 function lista_clientesxadmin(req, res, next) {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

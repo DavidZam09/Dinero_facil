@@ -1,5 +1,6 @@
 const { QueryTypes, Op } = require("sequelize");
 const fs = require("fs");
+
 var path = require("path");
 const moment = require('moment');
 const Email = require("../../Helpers/Email_config");
@@ -21,7 +22,7 @@ module.exports = {
   input_credito,
   lista_credito_cotizacion,
   cotizacion_credito,
-  //input_credito_cotizacion,
+  input_credito_cotizacion,
   lista_credito_estados_pago,
   lista_credito_pago,
   update_credito_pagoxcliente,
@@ -29,7 +30,8 @@ module.exports = {
   lista_creditosxcliente,
   create_aprobacion_credito,
   lista_pago_cuotasxuser,
-  update_aprobacion_pago_cuotaxadmin
+  update_aprobacion_pago_cuotaxadmin,
+  historial_creditos
 };
 
 /////////////////////////////////////////////////////////////////// servivios de los clientes //////////////////////////////////////////////////////////////////
@@ -39,6 +41,19 @@ async function lista_bancos() {
 
 async function lista_credito_estados() {
   return { successful: true, data: await Credito_estados.findAll() };
+}
+
+async function historial_creditos(id) {
+  var select = `SELECT c.*, cb.nombre_credito_bancos, ce.nombre_credito_tipo, 
+  ci.nombres_cliente, ci.apellidos_cliente, c2.email, c2.num_celular
+  FROM creditos AS c 
+  LEFT JOIN credito_bancos AS cb ON cb.id = c.id_banco
+  INNER  JOIN credito_estados AS ce ON ce.id = c.id_credito_estado
+  INNER  JOIN cliente_infos AS ci ON ci.id_cliente = c.id_cliente
+  INNER  JOIN clientes AS c2 ON c2.id = c.id_cliente
+  WHERE c.id_cliente = ${id} order by c.createdAt desc`;
+  var data = await Creditos.sequelize.query(select, { type: QueryTypes.SELECT });
+  return ({ successful: true, data: data });
 }
 
 async function un_credito(id) {
@@ -183,35 +198,6 @@ async function cotizacion_credito(req) {
   };
 }
 
-
-/*async function input_credito_cotizacion( datos ) {
-
-  var obj = {
-    id: datos.id,
-    valor_prestamo : datos.valor_prestamo,
-    frecuencia_cobro: datos.frecuencia_cobro,
-    interes: datos.interes,
-    interes_mora: datos.interes_mora,
-    activo: datos.activo
-  }
-
-  var data = null;
-  try {
-    if (datos.id === "" || datos.id === null){
-      data = await Creditos_cotizacion.create(obj);
-    }else{
-      data = await Creditos_cotizacion.findOne({ where: { id: datos.id } });
-      data.update(obj);
-    }
-    return { successful: true, data: data };
-  } catch (error) {
-    return {
-      successful: false,
-      data: "Error Al intentar Guardar en base de datos",
-    };
-  }
-}*/
-
 async function lista_credito_estados_pago() {
   return { successful: true, data: await Credito_pago_estados.findAll() };
 }
@@ -245,13 +231,15 @@ async function update_credito_pagoxcliente(datos) {
   if (!fs.existsSync(destDir)) {
     fs.mkdirSync(destDir, { recursive: true });
   }
-  await fs.promises.rename(datos.soporte_pago, destDir + `${data.num_pago}${fileType}`);
+  const destDir2 = path.join(__dirname, `../../uploads/temp/doc/${datos.nom_carpeta}/${datos.soporte_pago}`);
+  const destDir3 = destDir + `${data.num_pago}${fileType}`
+  await fs.promises.rename(destDir2, destDir3);
 
   // se actualiza pago
   try {
     await data.update({
       id: datos.id,
-      soporte_pago: datos.soporte_pago,
+      soporte_pago: `/doc/${data2.id_cliente}/creditos/${data2.id}/${data.num_pago}${fileType}`,//datos.soporte_pago,
       id_credito_pago_estado: 2,
       fecha_pago: moment().format('YYYY-MM-DD'),
       nota_admin: null
@@ -262,7 +250,6 @@ async function update_credito_pagoxcliente(datos) {
       data: "Error Al intentar Guardar en base de datos",
     };
   }
-
 
   const user = await Cliente.findOne({ where: { id: data2.id_cliente } });
   const resp = await un_credito(data.id_credito);
@@ -504,4 +491,31 @@ async function update_aprobacion_pago_cuotaxadmin(datos) {
   }
 
   return ({ successful: false, data: data });
+}
+
+async function input_credito_cotizacion( datos ) {
+  var obj = {
+    id: datos.id,
+    valor_prestamo : datos.valor_prestamo,
+    frecuencia_cobro: datos.frecuencia_cobro,
+    interes: datos.interes,
+    interes_mora: datos.interes_mora,
+    activo: datos.activo
+  }
+
+  var data = null;
+  try {
+    if (datos.id === "" || datos.id === null){
+      data = await Creditos_cotizacion.create(obj);
+    }else{
+      data = await Creditos_cotizacion.findOne({ where: { id: datos.id } });
+      data.update(obj);
+    }
+    return { successful: true, data: data };
+  } catch (error) {
+    return {
+      successful: false,
+      data: "Error Al intentar Guardar en base de datos",
+    };
+  }
 }

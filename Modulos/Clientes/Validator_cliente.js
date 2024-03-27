@@ -82,11 +82,16 @@ const lista_cliente_infoxcliente = [
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {
-            Cliente.findOne({ where: { id: data } }).then((Exist) => {
+            Cliente.findOne({ where: { id: data } }).then(async (Exist) => {
                if (Exist === null) {
                   reject(new Error("Cliente no existe."));
                } else {
-                  resolve(true);
+                  const cliente_info = await Cliente_info.findOne({ where: { id_cliente: data } });
+                  if( cliente_info === null ){
+                     reject(new Error("Cliente_info no existe."));
+                  }else{
+                     resolve(true);
+                  }
                }
             });
          });
@@ -103,7 +108,7 @@ const input_cliente_info = [
             } else {
                Cliente_info.findOne({ where: { id: data } }).then((Exist) => {
                   if (Exist === null) {
-                     reject(new Error("Cliente no existe."));
+                     reject(new Error("Cliente_info no existe."));
                   } else {
                      resolve(true);
                   }
@@ -116,21 +121,15 @@ const input_cliente_info = [
       .exists()
       .custom(async (data, { req }) => {
          return new Promise(async (resolve, reject) => {
+            const cliente = await Cliente.findOne({ where: { id: data } });
+            if( cliente === null ){
+               reject(new Error("El Cliente no existe"));
+            }
+
             if ((req.body.id === '') || (req.body.id === null)) {
-               const cliente_info = await Cliente_info.findOne({ where: { id_cliente: data } })
+               const cliente_info = await Cliente_info.findOne({ where:{ id_cliente: data } })
                if ((cliente_info === '') || (cliente_info === null)) {
-                  const cliente = await Cliente.findOne({
-                     where:
-                     {
-                        id: data,
-                        id_cliente_tipo: { [Sequelize.Op.in]: [1, 4] }
-                     }
-                  })
-                  if (cliente !== null) {
-                     resolve(true);
-                  } else {
-                     reject(new Error("El Cliente debe estar en estado Nuevo o Imcompleto."));
-                  }
+                  resolve(true);
                } else {
                   reject(new Error("Cliente_info ya existe."));
                }
@@ -139,14 +138,7 @@ const input_cliente_info = [
                if (cliente_info === null) {
                   reject(new Error("Cliente_info no existe o es erroneo."));
                } else {
-                  const cliente = await Cliente.findOne({
-                     where:
-                     {
-                        id: data,
-                        id_cliente_tipo: { [Sequelize.Op.in]: [1, 4] }
-                     }
-                  })
-                  if (cliente !== null) {
+                  if ( (cliente.id_cliente_tipo === 1) || (cliente.id_cliente_tipo === 4)) {
                      resolve(true);
                   } else {
                      reject(new Error("El Cliente debe estar en estado Nuevo o Imcompleto."));
@@ -206,8 +198,8 @@ const input_cliente_info = [
    body('nombre_empresa_labora').notEmpty().withMessage('variable no existe o es nula'),
    body("ingreso_mesual").isInt().withMessage("Solo se admiten numero enteros"),
    body("gasto_mensual").isInt().withMessage("Solo se admiten numero enteros"),
-   body('tratamiento_datos').isInt({ min: 0, max: 1 }).withMessage("El campo debe tener entre 0 y 1 caracteres"),
-   body('terminos_y_condiciones').isInt({ min: 0, max: 1 }).withMessage("El campo debe tener entre 0 y 1 caracteres"),
+   body('tratamiento_datos').isIn(["SI","NO"]).withMessage('Solo es permitido los valores SI y NO'),
+   body('terminos_y_condiciones').isIn(["SI","NO"]).withMessage('Solo es permitido los valores SI y NO'),
    body("rf1_nombre_completo").notEmpty().withMessage('variable no existe o es nula'),
    body("rf1_num_celular").notEmpty().withMessage('variable no existe o es nula'),
    body("rf1_direccion").notEmpty().withMessage('variable no existe o es nula'),
@@ -262,24 +254,6 @@ const lista_clientesxadmin = [
                      });
                   }
                });
-               /*Cliente.findOne({ where: { id: data } }).then(async (Exist) => {
-                  if (Exist === null) {
-                     reject(new Error("Cliente no existe."));
-                  } else {
-                     var data = await Cliente_info.findOne({ where: { id_cliente: data } });
-                     if (data === null) {
-                        reject(new Error("Cliente info no datae."));
-                     }if ( parseInt(data.id_cliente_tipo) ===  1 ) {
-                        resolve(true);
-                     }if ( parseInt(data.id_cliente_tipo) ===  2 ) {
-                        reject(new Error("No se puede modificar el estado de un cliente Aprobado"));
-                     }if ( parseInt(data.id_cliente_tipo) ===  3 ) {
-                        reject(new Error("No se puede modificar el estado de un cliente No Apto"));
-                     }if ( parseInt(data.id_cliente_tipo) ===  4 ) {
-                        resolve(true);
-                     }
-                  }
-               });*/
             });
          }),
       body("nota_admin").notEmpty().withMessage('variable es nula'),

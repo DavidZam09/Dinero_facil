@@ -104,11 +104,11 @@ const cliente_info = sequelize.define("cliente_info", {
     allowNull: true,
   },
   tratamiento_datos: {
-    type: DataTypes.BOOLEAN,
+    type: DataTypes.STRING,
     allowNull: false
   },
   terminos_y_condiciones: {
-    type: DataTypes.BOOLEAN,
+    type: DataTypes.STRING,
     allowNull: false
   },
   rf1_nombre_completo: {

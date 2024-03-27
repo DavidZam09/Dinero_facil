@@ -21,6 +21,7 @@ app.post('/cliente_info/input_cliente_info',
     Val.input_cliente_info,
     clientes.input_cliente_info
 );
+app.get('/documento/get_doc', clientes.get_doc);
 
 /////////////////////////////////////////////////////////////////// Servicios de los Admin //////////////////////////////////////////////////////////////////
 app.get('/admin/cliente/lista_clientesxadmin', Val.lista_clientesxadmin, clientes.lista_clientesxadmin);

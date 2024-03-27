@@ -42,7 +42,7 @@ async function files_save(req, res, next) {
     nombreArchivo = `${fieldname}.${ext}`;
     filePath = `${uploadDir}/${nombreArchivo}`;
     file.pipe(fs.createWriteStream(filePath));
-    req.body[fieldname] = filePath;
+    req.body[fieldname] = nombreArchivo;//filePath;
     req.files.push(filePath);
   });
 

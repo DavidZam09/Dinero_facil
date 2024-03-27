@@ -56,8 +56,8 @@ const input_credito = [
                if (Exist === null) {
                   reject(new Error("Cliente no existe o no ha sido aprobado."));
                } else {
-                  if ( Exist.id_cliente_tipo === 1 ){
-                     Creditos.findOne({ where: { id_cliente: data, id_credito_estado: { [Sequelize.Op.in]: [1,5] } } }).then((Exist) => {
+                  if ( Exist.id_cliente_tipo === 2 ){
+                     Creditos.findOne({ where: { id_cliente: data, id_credito_estado: { [Sequelize.Op.in]: [1,2,5] } } }).then((Exist) => {
                         if (Exist === null) {   
                            resolve(true);
                         } else {
@@ -93,8 +93,6 @@ const input_credito = [
             }
          });
       }),
-   //body("valor_credito").isInt().withMessage("Solo se admiten numero enteros"),
-   //body('entrega_en_efectivo').isIn(["SI","NO"]).withMessage('Solo es permitido los valores SI y NO'),
    body('tipo_cobro').isIn(["Efectivo","Transferencia"]).withMessage('Solo es permitido los valores Efectivo y Transferencia'),
    body("tipo_cuenta", "Invalido Tipo de Cuenta")
       .exists()
@@ -106,7 +104,7 @@ const input_credito = [
                }if(data==="Corriente") {
                   resolve(true)
                } else {
-                  reject(new Error('Solo es permitido los valores "Ahorros" y "Corriente"'))
+                  reject(new Error('Solo es permitido los valores Ahorros y Corriente'))
                }
             }else{
                resolve(true)
@@ -128,11 +126,7 @@ const input_credito = [
             }
          });
       }),
-   //body('periodicidad_cobro').isIn(["Semanal","Quincenal"]).withMessage('Solo es permitido los valores Semanal y Quincenal'),
-   //body("num_cuotas").isInt().withMessage("Solo se admiten numero enteros"),
-   body("nota_cliente").exists().withMessage("No existe el campo nota_cliente"),
-   //body('fec_desembolso').optional({ nullable: true, checkFalsy: true  }).isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
-   //body('fec_pazysalvo').optional({ nullable: true, checkFalsy: true  }).isISO8601('yyyy-mm-dd').toDate().withMessage('Solo se permite fecha con el formato YYY-MM-DD'),
+   body("nota_cliente").exists().withMessage("No existe el campo nota_cliente")
 ];
 
 const cotizacion_credito = [
@@ -192,6 +186,22 @@ const un_credito = [
             });
          });
       }),
+];
+
+const historial_creditos = [
+   check('id', "Invalido Credito")
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Cliente.findOne({ where: { id: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Cliente no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      })
 ];
 
 const update_credito_pagoxcliente = [
@@ -302,5 +312,6 @@ module.exports = {
    lista_creditosxcliente,
    create_aprobacion_credito,
    lista_pago_cuotasxuser,
-   update_aprobacion_pago_cuotaxadmin
+   update_aprobacion_pago_cuotaxadmin,
+   historial_creditos
 };

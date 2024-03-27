@@ -37,6 +37,7 @@ module.exports = {
 };
 
 /////////////////////////////////////////////////////////////////// Servicios de los Admin //////////////////////////////////////////////////////////////////
+
 async function lista_clientesxadmin(id_user, id_cliente_info) {
 
   var where = null;
@@ -129,9 +130,9 @@ async function registrar_cliente(data) {
   data.cod_personal = cod;
   data.id_cliente_tipo = 1;
 
+  var cliente = null;
   try {
-    var cliente = await Cliente.create(data);
-    delete cliente.password;
+    cliente = await Cliente.create(data);
   } catch (error) {
     console.log(error);
     return { successful: false, error: error };
@@ -154,6 +155,7 @@ async function registrar_cliente(data) {
   const transporter = await Email.createTransporter();
   await Email.sendMail(transporter, mailOptions);
 
+  delete cliente.dataValues.password
   return { successful: true, data: cliente };
 }
 
@@ -252,11 +254,19 @@ async function input_cliente_info(datos) {
     });
   });
 
+  const dir2 = `/doc/${datos.id_cliente}/`;
+
   var titulo = null;
   var user = null;
   datos.nota_admin = null;
   try {
     if (datos.id === "" || datos.id === null) {
+      datos.foto_cliente = dir2 + datos.foto_cliente;
+      datos.foto_doc_frontal = dir2 + datos.foto_doc_frontal;
+      datos.foto_doc_trasera = dir2 + datos.foto_doc_trasera;
+      datos.foto_recivo_publico = dir2 + datos.foto_recivo_publico;
+      datos.foto_pago_nomina = dir2 + datos.foto_pago_nomina;
+      
       titulo = "Creacion ";
       data = await Cliente_info.create(datos); // guardo
 
@@ -281,6 +291,12 @@ async function input_cliente_info(datos) {
       const cliente = await Cliente.findOne({ where: { id: datos.id_cliente } });
       cliente.update({ id_usuario: user[0].id });
     }else {
+      datos.foto_cliente === undefined? null: datos.foto_cliente = dir2 + datos.foto_cliente;
+      datos.foto_doc_frontal  === undefined? null: datos.foto_doc_frontal = dir2 + datos.foto_doc_frontal;
+      datos.foto_doc_trasera  === undefined? null: datos.foto_doc_trasera = dir2 + datos.foto_doc_trasera;
+      datos.foto_recivo_publico  === undefined? null: datos.foto_recivo_publico = dir2 + datos.foto_recivo_publico;
+      datos.foto_pago_nomina  === undefined? null: datos.foto_pago_nomina = dir2 + datos.foto_pago_nomina;
+
       titulo = "Actualicion "
       data = await Cliente_info.findOne({ where: { id: datos.id } });
       data.update(datos);
