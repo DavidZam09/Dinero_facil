@@ -11,5 +11,7 @@ app.get('/admin/usuarios/lista_usersxrol',  Val.lista_usersxrol, User.lista_user
 app.post('/admin/usuarios/input_user',  Val.input_user, User.input_user);
 app.post('/admin/usuarios/login_user', Val.login_user, User.login_user);
 
+app.get('/admin/lista_config', User.lista_config);
+
 module.exports = app;
 

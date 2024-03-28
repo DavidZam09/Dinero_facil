@@ -131,6 +131,7 @@ const input_credito = [
 
 const cotizacion_credito = [
    check('id', "Invalido Credito Cotizacion")
+      .isInt()
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => { 
@@ -149,22 +150,23 @@ const cotizacion_credito = [
 
 const input_credito_cotizacion = [
    body('id', "Invalido Credito Cotizacion")
-   .exists()
-   .custom((data) => {
-      return new Promise((resolve, reject) => {
-         if ((data === '') || (data === null)) {
-            resolve(true);
-         } else {
-            Credito_cotizacion.findOne({ where: { id: data } }).then((Exist) => {
-               if (Exist === null) {
-                  reject(new Error("Credito Cotizacion no existe."));
-               } else {
-                  resolve(true);
-               }
-            });
-         }
-      });
-   }),
+      .isInt()
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            if ((data === '') || (data === null)) {
+               resolve(true);
+            } else {
+               Credito_cotizacion.findOne({ where: { id: data } }).then((Exist) => {
+                  if (Exist === null) {
+                     reject(new Error("Credito Cotizacion no existe."));
+                  } else {
+                     resolve(true);
+                  }
+               });
+            }
+         });
+      }),
    body("valor_prestamo").isInt({min: 1}).withMessage("Solo se admiten numero mayores a 0"),
    body('frecuencia_cobro').isIn(["Semanal","Quincenal"]).withMessage('Solo es permitido los valores Semanal y Quincenal'),
    body("interes").isInt({min: 1}).withMessage("Solo se admiten numero mayores a 0"),
@@ -174,6 +176,7 @@ const input_credito_cotizacion = [
 
 const un_credito = [
    check('id', "Invalido Credito")
+      .isInt()
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {
@@ -190,6 +193,7 @@ const un_credito = [
 
 const historial_creditos = [
    check('id', "Invalido Credito")
+      .isInt()
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {
@@ -206,6 +210,7 @@ const historial_creditos = [
 
 const update_credito_pagoxcliente = [
    body('id', "Invalido Credito")
+      .isInt()
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {
@@ -229,6 +234,7 @@ const update_credito_pagoxcliente = [
 /////////////////////////////////////////////////////////////////// validacion de los admin //////////////////////////////////////////////////////////////////
 const lista_creditosxcliente = [
    check('id', "Invalido Credito")
+      .isInt()
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {
@@ -245,6 +251,7 @@ const lista_creditosxcliente = [
 
 const create_aprobacion_credito = [
    body('id', "Invalido Credito")
+      .isInt()
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {
@@ -267,6 +274,7 @@ const create_aprobacion_credito = [
 
 const lista_pago_cuotasxuser = [
    check('id', "Invalido Credito")
+      .isInt()
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {
@@ -283,6 +291,7 @@ const lista_pago_cuotasxuser = [
 
 const update_aprobacion_pago_cuotaxadmin = [
    body('id', "Invalido Pago Cuota")
+      .isInt()
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {
@@ -303,6 +312,23 @@ const update_aprobacion_pago_cuotaxadmin = [
    body("nota_admin").notEmpty().withMessage('campo es nula')
    ];
 
+const lista_creditosxadmin = [
+   check('id', "Invalido Usuario")
+      .isInt()
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Usuarios.findOne({ where: { id: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Usuario no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      })
+   ];
+
 module.exports = {
    input_credito,
    cotizacion_credito,
@@ -313,5 +339,6 @@ module.exports = {
    create_aprobacion_credito,
    lista_pago_cuotasxuser,
    update_aprobacion_pago_cuotaxadmin,
-   historial_creditos
+   historial_creditos,
+   lista_creditosxadmin
 };

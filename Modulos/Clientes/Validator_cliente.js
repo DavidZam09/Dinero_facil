@@ -240,8 +240,6 @@ const lista_clientesxadmin = [
                      Cliente.findOne({ where: { id: Exist.id_cliente } }).then(async (data) => {
                         if (data === null) {
                            reject(new Error("Cliente no existe."));
-                        } if (data === null) {
-                           reject(new Error("Cliente info no datae."));
                         }if ( parseInt(data.id_cliente_tipo) ===  1 ) {
                            resolve(true);
                         }if ( parseInt(data.id_cliente_tipo) ===  2 ) {

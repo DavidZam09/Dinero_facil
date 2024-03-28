@@ -19,7 +19,8 @@ module.exports = {
     create_aprobacion_credito,
     lista_pago_cuotasxuser,
     update_aprobacion_pago_cuotaxadmin,
-    historial_creditos
+    historial_creditos,
+    lista_creditosxadmin
 };
 
 /////////////////////////////////////////////////////////////////// controladores de los cliente //////////////////////////////////////////////////////////////////
@@ -170,6 +171,16 @@ function input_credito_cotizacion(req, res, next) {
         return res.json({ successful: false, errors: errors.array() });
     }
     Creditos.input_credito_cotizacion( req.body ).then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+function lista_creditosxadmin(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
+    Creditos.lista_creditosxadmin(req.query.id).then((respuerta) => {
         return res.send(respuerta);
     });
 }

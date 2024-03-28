@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const Auth_cliente = require('./Auth_cliente');
 var clientes = require('./Controller_cliente');
+var User = require('../Usuarios/Controller_usuario');
 const Val  = require('./Validator_cliente');
 const Upload_files = require('../../Helpers/Upload_files');
 
@@ -22,10 +23,13 @@ app.post('/cliente_info/input_cliente_info',
     clientes.input_cliente_info
 );
 app.get('/documento/get_doc', clientes.get_doc);
+app.get('/cliente/lista_tipo_doc', User.lista_tipo_doc);
+app.get('/cliente/lista_config', User.lista_config);
 
 /////////////////////////////////////////////////////////////////// Servicios de los Admin //////////////////////////////////////////////////////////////////
 app.get('/admin/cliente/lista_clientesxadmin', Val.lista_clientesxadmin, clientes.lista_clientesxadmin);
 app.post('/admin/cliente/update_aprobacion_cliente', Val.update_aprobacion_cliente, clientes.update_aprobacion_cliente);
+
 
 module.exports = app;
 

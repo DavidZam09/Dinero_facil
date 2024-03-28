@@ -31,7 +31,8 @@ module.exports = {
   create_aprobacion_credito,
   lista_pago_cuotasxuser,
   update_aprobacion_pago_cuotaxadmin,
-  historial_creditos
+  historial_creditos,
+  lista_creditosxadmin
 };
 
 /////////////////////////////////////////////////////////////////// servivios de los clientes //////////////////////////////////////////////////////////////////
@@ -126,9 +127,12 @@ async function input_credito(datos) {
     }
   })
 
+  const options1 = { style: "currency", currency: "COP" };
+  const numberFormat1 = new Intl.NumberFormat("es-CO", options1);
+
   // envio de correo cliente
   var text = mensajes[0].mensaje.replace('||1', titulo);
-  text = text.replace('||2', resp.data[0].valor_credito)
+  text = text.replace('||2', numberFormat1.format(resp.data[0].valor_credito))
   const mailOptions1 = {
     from: correo_envia.valor_variable,
     to: resp.data[0].email,
@@ -139,7 +143,7 @@ async function input_credito(datos) {
   await Email.sendMail(transporter1, mailOptions1);
 
   // envio de correo admin
-  var text1 = mensajes[1].mensaje.replace('||1', data.valor_credito);
+  var text1 = mensajes[1].mensaje.replace('||1', numberFormat1.format(data.valor_credito) );
   text1 = text1.replace('||2', `${resp.data[0].nombres_cliente} ${resp.data[0].apellidos_cliente}`);
   text1 = text1.replace('||3', resp.data[0].email);
   text1 = text1.replace('||4', resp.data[0].num_celular);
@@ -518,4 +522,16 @@ async function input_credito_cotizacion( datos ) {
       data: "Error Al intentar Guardar en base de datos",
     };
   }
+}
+
+async function lista_creditosxadmin(id) {
+  var select = `SELECT c.*, ce.id, cb.nombre_credito_bancos FROM creditos AS c
+  INNER JOIN clientes AS cc ON cc.id = c.id_cliente
+  INNER JOIN users AS u ON u.id = cc.id_usuario 
+  INNER JOIN credito_estados AS ce ON ce.id = c.id_credito_estado
+  LEFT JOIN credito_bancos AS cb ON cb.id = c.id_banco
+  WHERE cc.id_cliente_tipo = 2 AND  c.id_credito_estado IN ( 1, 5 ) and
+  cc.id_usuario = ${id}`;
+  var data = await Creditos.sequelize.query(select, { type: QueryTypes.SELECT });
+  return ({ successful: true, data: data });
 }

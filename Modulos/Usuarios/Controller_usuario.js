@@ -8,7 +8,14 @@ module.exports = {
     lista_usersxrol,
     input_user,
     login_user,
+    lista_config
 };
+
+function lista_config(req, res, next) {
+    Usuario.lista_config().then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
 
 function lista_roles(req, res, next) {
     Usuario.lista_roles().then((respuerta) => {

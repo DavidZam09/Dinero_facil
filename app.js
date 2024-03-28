@@ -40,7 +40,14 @@ app.use(require('./Modulos/Usuarios/Route_usuario'));
 app.use(require('./Modulos/Clientes/Route_cliente'));
 app.use(require('./Modulos/Creditos/Route_creditos'));
 
-cron.schedule('33 12 * * *', Task.test);
+//cron.schedule('00 08 * * *', Task.test);
+cron.schedule('00 08 * * *', Task.Asignar_Cobrador);
+cron.schedule('00 08 * * *', Task.Recordatorio_pago_cobro);
+cron.schedule('00 08 * * *', Task.Aviso_mora_pago_cuota);
+var Cron = require('./Helpers/Cron');
+//app.get('/cron/test',  Cron.Asignar_Cobrador);
+//app.get('/cron/test',  Cron.Recordatorio_pago_cobro);
+//app.get('/cron/test',  Cron.Aviso_mora_pago_cuota);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

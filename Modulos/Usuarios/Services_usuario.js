@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const Rol = require('./Model_rol');
 const Tipo_doc = require('./Model_tipo_doc');
 const User = require('./Model_usuario');
+const Config = require('../Creditos/Model_config');
 
 module.exports = {
     lista_roles,
@@ -14,8 +15,15 @@ module.exports = {
     lista_usersxrol,
     create_user,
     update_user,
-    login_user
+    login_user,
+    lista_config
 };
+
+async function lista_config() {
+    return ({ successful: true, 
+        data: await Config.findAll({ where: {  id: { [SQL.Op.notIn]: [5] } } })
+    });
+}
 
 async function lista_roles() {
     return ({ successful: true, data: await Rol.findAll() });
