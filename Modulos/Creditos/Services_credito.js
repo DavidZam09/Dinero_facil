@@ -366,7 +366,41 @@ async function create_aprobacion_credito(datos) {
   return ({ successful: true, data: data });
 }
 
-async function lista_pago_cuotasxuser(id) {
+async function lista_pago_cuotasxuser(id){
+
+  var select1 = `SELECT cpc.*,
+      cpe.nombre_estado_pago,
+      DATEDIFF( cpc.fecha_estimada_pago, DATE( NOW()) ) AS dias_mora,
+      if( DATEDIFF( cpc.fecha_estimada_pago, DATE( NOW()) ) > 0, 
+        (c.valor_credito / c.num_cuotas) + c.valor_interes  ,
+        (c.valor_credito / c.num_cuotas) + c.valor_interes + c.valor_interes_mora
+      ) AS estimado_pago,
+      c.tipo_cobro,
+      c.num_cuenta,
+      c.tipo_cuenta,
+      c.frecuencia_cobro,
+      cb.nombre_credito_bancos,
+      cc.email,
+      cc.num_celular,
+      CONCAT(ci.nombres_cliente, " ", ci.apellidos_cliente) AS nom_completo,
+      ci.dpto,
+      ci.ciudad,
+      ci.direccion,
+      ci.foto_cliente
+    FROM credito_pago_cuotas AS cpc 
+    INNER JOIN credito_pago_estados AS cpe ON cpc.id_credito_pago_estado = cpe.id
+    INNER JOIN creditos AS c ON c.id = cpc.id_credito
+    LEFT JOIN credito_bancos AS cb ON cb.id = c.id_banco
+    INNER JOIN clientes AS cc ON cc.id = c.id_cliente 
+    INNER JOIN cliente_infos AS ci ON ci.id_cliente = c.id_cliente
+    WHERE cpc.id_user_cobra =  ${id} and cpc.id_credito_pago_estado = 2
+    ORDER BY  DATEDIFF( cpc.fecha_estimada_pago, DATE( NOW()) ) asc`
+
+  const data = await Creditos.sequelize.query(select1, { type: QueryTypes.SELECT });
+  return ({ successful: false, data: data });
+}
+
+/*async function lista_pago_cuotasxuser(id) {
   var select1 = `SELECT 
 	  cc.id AS id_credito,
     c.id,
@@ -423,7 +457,7 @@ async function lista_pago_cuotasxuser(id) {
   });
 
   return ({ successful: false, data: array1 });
-}
+}*/
 
 async function update_aprobacion_pago_cuotaxadmin(datos) {
 
