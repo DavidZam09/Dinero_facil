@@ -150,7 +150,6 @@ const cotizacion_credito = [
 
 const input_credito_cotizacion = [
    body('id', "Invalido Credito Cotizacion")
-      .isInt()
       .exists()
       .custom((data) => {
          return new Promise((resolve, reject) => {
