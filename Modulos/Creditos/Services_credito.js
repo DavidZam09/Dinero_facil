@@ -397,7 +397,7 @@ async function lista_pago_cuotasxuser(id){
     ORDER BY  DATEDIFF( cpc.fecha_estimada_pago, DATE( NOW()) ) asc`
 
   const data = await Creditos.sequelize.query(select1, { type: QueryTypes.SELECT });
-  return ({ successful: false, data: data });
+  return ({ successful: true, data: data });
 }
 
 /*async function lista_pago_cuotasxuser(id) {
@@ -528,7 +528,7 @@ async function update_aprobacion_pago_cuotaxadmin(datos) {
 
   }
 
-  return ({ successful: false, data: data });
+  return ({ successful: true, data: data });
 }
 
 async function input_credito_cotizacion( datos ) {
