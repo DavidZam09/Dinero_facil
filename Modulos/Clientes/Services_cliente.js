@@ -38,14 +38,13 @@ module.exports = {
 
 /////////////////////////////////////////////////////////////////// Servicios de los Admin //////////////////////////////////////////////////////////////////
 
-async function lista_clientesxadmin(id_user, id_cliente_info) {
+async function lista_clientesxadmin(data) {
 
   var where = null;
-  if( id_user !== null){
-    where = ` WHERE c.id_usuario = ${id_user}`;
-  }
-  if( id_cliente_info !== null){
-    where = ` WHERE ci.id = ${id_cliente_info}`;
+  if( data.id_estado_cliente !== undefined){
+    where = ` WHERE c.id_usuario = ${data.id} and c.id_cliente_tipo = ${data.id_estado_cliente}`;
+  }else{
+    where = ` WHERE ci.id = ${data.id}`;
   }
 
   var select = `SELECT ci.*, c.num_celular, c.email, ct.nombre_tipo_cliente, 
@@ -54,7 +53,7 @@ async function lista_clientesxadmin(id_user, id_cliente_info) {
   INNER JOIN user_tipo_docs AS utd ON  ci.id_user_tipo_doc = utd.id
   INNER JOIN cliente_actividad_ecos AS cae ON  ci.id_cliente_actividad_eco = cae.id
   INNER JOIN cliente_sector_ecos AS cse ON  ci.id_cliente_sector_eco = cse.id
-  INNER JOIN clientes AS c ON ci.id_cliente = ci.id_cliente = c.id
+  INNER JOIN clientes AS c ON ci.id_cliente = c.id
   INNER JOIN users AS u ON c.id_usuario = u.id
   inner JOIN cliente_tipos AS ct on c.id_cliente_tipo = ct.id ${where}`;
   var data = await User.sequelize.query(select, { type: QueryTypes.SELECT });
@@ -78,7 +77,9 @@ async function update_aprobacion_cliente( req ) {
     return { successful: false, error: error };
   }
 
-  const resp = await lista_clientesxadmin(null, req.id);
+  var data1 = {};
+  data1.id =  req.id
+  const resp = await lista_clientesxadmin( data1 );
 
   // envio de correo cliente
   const mensajes = await Config_mensajes.findAll({ where:{ id: 8 } });
@@ -301,6 +302,7 @@ async function input_cliente_info(datos) {
       data = await Cliente_info.findOne({ where: { id: datos.id } });
       data.update(datos);
       const cliente = await Cliente.findOne({ where: { id: datos.id_cliente } });
+      cliente.update({ id_cliente_tipo: 1 });
       user = await User.findAll({ where: { id: cliente.id_usuario } });
     }
   } catch (error) {

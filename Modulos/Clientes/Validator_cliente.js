@@ -5,9 +5,11 @@ const Cliente_info = require("./Model_clientes_info");
 const Cliente_act_eco = require("./Model_clientes_actividad_eco");
 const Cliente_sec_eco = require("./Model_clientes_sector_eco");
 const Cliente = require('./Model_cliente');
+const Tipo_Cliente = require('./Model_clientes_tipo');
 
 const Tipo_doc = require("../Usuarios/Model_tipo_doc");
 const User = require("../Usuarios/Model_usuario");
+
 
 /////////////////////////////////////////////////////////////////// validaciones para los Clientes //////////////////////////////////////////////////////////////////
 
@@ -211,7 +213,21 @@ const input_cliente_info = [
 /////////////////////////////////////////////////////////////////// validaciones para los admin //////////////////////////////////////////////////////////////////
 
 const lista_clientesxadmin = [
-   check("id", "Invalido Usuario")
+   check("id_estado_cliente", "Invalido Usuario")
+      .isInt()
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Tipo_Cliente.findOne({ where: { id: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Cliente Tipo no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      }),
+      check("id", "Invalido Usuario")
       .isInt()
       .exists()
       .custom((data) => {
@@ -243,9 +259,11 @@ const lista_clientesxadmin = [
                         }if ( parseInt(data.id_cliente_tipo) ===  1 ) {
                            resolve(true);
                         }if ( parseInt(data.id_cliente_tipo) ===  2 ) {
-                           reject(new Error("No se puede modificar el estado de un cliente Aprobado"));
+                           //reject(new Error("No se puede modificar el estado de un cliente Aprobado"));
+                           resolve(true);
                         }if ( parseInt(data.id_cliente_tipo) ===  3 ) {
-                           reject(new Error("No se puede modificar el estado de un cliente No Apto"));
+                           //reject(new Error("No se puede modificar el estado de un cliente No Apto"));
+                           resolve(true);
                         }if ( parseInt(data.id_cliente_tipo) ===  4 ) {
                            resolve(true);
                         }

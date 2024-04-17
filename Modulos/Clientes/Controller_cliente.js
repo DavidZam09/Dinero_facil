@@ -43,7 +43,7 @@ function lista_clientesxadmin(req, res, next) {
     if (!errors.isEmpty()) {
         return res.json({ successful: false, errors: errors.array() });
     }
-    Cliente.lista_clientesxadmin(req.query.id, null).then((respuerta) => {
+    Cliente.lista_clientesxadmin( req.query ).then((respuerta) => {
         return res.send(respuerta);
     });
 }
