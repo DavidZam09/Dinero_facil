@@ -180,7 +180,7 @@ function lista_creditosxadmin(req, res, next) {
     if (!errors.isEmpty()) {
         return res.json({ successful: false, errors: errors.array() });
     }
-    Creditos.lista_creditosxadmin(req.query.id).then((respuerta) => {
+    Creditos.lista_creditosxadmin(req.query).then((respuerta) => {
         return res.send(respuerta);
     });
 }

@@ -558,15 +558,15 @@ async function input_credito_cotizacion( datos ) {
   }
 }
 
-async function lista_creditosxadmin(id) {
+async function lista_creditosxadmin(data) {
   var select = `SELECT c.*, ce.nombre_credito_tipo, cb.nombre_credito_bancos, cc.num_celular, 
   CONCAT( ci.nombres_cliente, " ", ci.apellidos_cliente) as nom_completo  FROM creditos AS c
   INNER JOIN clientes AS cc ON cc.id = c.id_cliente
   INNER JOIN cliente_infos AS ci ON cc.id = ci.id_cliente
   INNER JOIN credito_estados AS ce ON ce.id = c.id_credito_estado
   LEFT JOIN credito_bancos AS cb ON cb.id = c.id_banco
-  WHERE cc.id_cliente_tipo = 2 AND  c.id_credito_estado IN ( 1, 5 ) and
-  cc.id_usuario = ${id}`;
+  WHERE cc.id_cliente_tipo = 2 AND  c.id_credito_estado = ${data.id_credito_estado} and
+  cc.id_usuario = ${data.id}`;
   var data = await Creditos.sequelize.query(select, { type: QueryTypes.SELECT });
   return ({ successful: true, data: data });
 }

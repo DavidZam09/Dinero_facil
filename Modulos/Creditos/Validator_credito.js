@@ -325,8 +325,22 @@ const lista_creditosxadmin = [
                }
             });
          });
+      }),
+      check('id_credito_estado', "Invalido Credito Estado")
+      .isInt()
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Credito_estados.findOne({ where: { id: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Credito Estado no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
       })
-   ];
+];
 
 module.exports = {
    input_credito,
