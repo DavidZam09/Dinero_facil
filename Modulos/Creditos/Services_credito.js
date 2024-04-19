@@ -295,7 +295,8 @@ async function update_credito_pagoxcliente(datos) {
 /////////////////////////////////////////////////////////////////// servivios de los admin //////////////////////////////////////////////////////////////////
 
 async function lista_creditosxcliente(id) {
-  var select = `SELECT c.*, ce.id, cb.nombre_credito_bancos FROM creditos AS c
+  var select = `SELECT c.*, ce.nombre_credito_tipo, cb.nombre_credito_bancos 
+  FROM creditos AS c
   INNER JOIN credito_estados AS ce ON ce.id = c.id_credito_estado
   LEFT JOIN credito_bancos AS cb ON cb.id = c.id_banco
   WHERE c.id_cliente = ${id}`;
