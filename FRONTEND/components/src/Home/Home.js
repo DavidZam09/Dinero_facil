@@ -1,16 +1,18 @@
 // src/App.js
 
-import React from 'react';
+import { React, useEffect } from 'react';
 import SidebarMenu from '../slideBar/SlideBar';
+import './Home.css'
+import logo from '../logo.svg';
 
 function Home() {
   return (
-    <div className="App">
-    <header className="App-header">
-      <h1>Home</h1>
-    </header>
-    <SidebarMenu />
-  </div>
+    <div className="centered">
+      <SidebarMenu />
+      <div >
+        <img src={logo} className="img" alt="logo" />
+      </div>
+    </div>
   );
 }
 

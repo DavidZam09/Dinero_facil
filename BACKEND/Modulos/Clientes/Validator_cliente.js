@@ -5,6 +5,7 @@ const Cliente_info = require("./Model_clientes_info");
 const Cliente_act_eco = require("./Model_clientes_actividad_eco");
 const Cliente_sec_eco = require("./Model_clientes_sector_eco");
 const Cliente = require('./Model_cliente');
+const Cliente_recupera_pass = require('./Model_cliente_recupera_pass');
 const Tipo_Cliente = require('./Model_clientes_tipo');
 
 const Tipo_doc = require("../Usuarios/Model_tipo_doc");
@@ -210,6 +211,90 @@ const input_cliente_info = [
    body("rf2_direccion").notEmpty().withMessage('variable no existe o es nula')
 ];
 
+const val_correo_cliente = [
+   check("email").isEmail().withMessage("Solo se admiten correos"),
+   check("email", "Invalid Email")
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Cliente.findOne({ where: { email: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Email no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      })
+];
+
+const cambio_pass = [
+   body("code")
+   .isLength({ min: 10, max: 10 })
+   .withMessage("El campo debe tener 10 digitos"),
+   body("code", "Invalid Code")
+      .exists()
+      .custom((data, {req}) => {
+         return new Promise((resolve, reject) => {
+            Cliente_recupera_pass.findOne({ where: { cod_recupera: data } }).then(async (Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Code no existe."));
+               } else {
+                  var cliente = await Cliente.findOne({where:{email: req.body.email}});
+                  if( cliente === null ){
+                     reject(new Error("Cliente no existe."));
+                  }else if (cliente.id === Exist.id_cliente) {
+                     resolve(true);
+                  } else {
+                     reject(new Error("Code no existe."));
+                  }
+               }
+            });
+         });
+      }),
+   body("password")
+      .isLength({ min: 6, max: 16 })
+      .withMessage("El campo debe tener entre 6 y 16 caracteres"),
+   body("password")
+      .matches(/^(?=.*[A-Z])(?=.*\d).+$/)
+      .withMessage(
+         "El campo debe contener al menos una letra mayúscula y un número"
+      ),
+   body("password_repeat")
+      .isLength({ min: 6, max: 16 })
+      .withMessage("El campo debe tener entre 6 y 16 caracteres"),
+   body("password_repeat")
+      .matches(/^(?=.*[A-Z])(?=.*\d).+$/)
+      .withMessage(
+         "El campo debe contener al menos una letra mayúscula y un número"
+      ),
+   body("password_repeat", "Invalid password_repeat")
+      .exists()
+      .custom((data, {req}) => {
+         return new Promise((resolve, reject) => {
+            if( data === req.body.password ){
+               resolve(true);
+            }else{
+               reject(new Error("Los Password no son los mismos."));
+            }
+         })
+      }),
+   body("email").isEmail().withMessage("Solo se admiten correos"),
+   body("email", "Invalid Email")
+      .exists()
+      .custom((data) => {
+         return new Promise((resolve, reject) => {
+            Cliente.findOne({ where: { email: data } }).then((Exist) => {
+               if (Exist === null) {
+                  reject(new Error("Email no existe."));
+               } else {
+                  resolve(true);
+               }
+            });
+         });
+      })
+];
+
 /////////////////////////////////////////////////////////////////// validaciones para los admin //////////////////////////////////////////////////////////////////
 
 const lista_clientesxadmin = [
@@ -281,6 +366,9 @@ module.exports = {
    login_cliente,
    lista_cliente_infoxcliente,
    input_cliente_info,
+   val_correo_cliente,
+   cambio_pass,
+
    lista_clientesxadmin,
    update_aprobacion_cliente
 };

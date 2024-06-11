@@ -72,6 +72,9 @@ async function un_credito(id) {
 
 async function input_credito(datos) {
 
+  const user = await Cliente.findOne({ where: { id: datos.id_cliente } });
+  const por_descu = await Config.findOne({ where: { id: 11 } });
+
   var obj = {
     id: datos.id,
     id_credito_estado: 1,
@@ -82,7 +85,8 @@ async function input_credito(datos) {
     tipo_cuenta: datos.tipo_cuenta,
     nota_cliente: datos.nota_cliente,
     num_cuotas: datos.num_cuotas,
-    nota_admin: null
+    nota_admin: null,
+    val_descu_ref: 0
   }
 
   if ((datos.id === '') || (datos.id === null)) {
@@ -92,6 +96,11 @@ async function input_credito(datos) {
     obj.valor_interes_mora = interes_mora;
     obj.frecuencia_cobro = frecuencia_cobro;
     obj.id_credito_estado = datos.id_credito_estado;
+
+    // aplico descuento al solo al crear si hay
+    if( user.cobro_descu_ref === 'SI' ){
+      obj.val_descu_ref = Math.round( valor_prestamo * por_descu.valor_variable / 100 );
+    }
   }
 
   if (datos.tipo_cobro === 'Efectivo') {
@@ -118,15 +127,14 @@ async function input_credito(datos) {
     };
   }
 
-  const user = await Cliente.findOne({ where: { id: datos.id_cliente } });
   const resp = await un_credito(data.id);
-  const correo_envia = await Config.findOne({ where: { id: 4 } });
   const mensajes = await Config_mensajes.findAll({
     where: {
       id: { [Op.in]: [4, 5] }
     }
   })
 
+  const correo_envia = await Config.findOne({ where: { id: 4 } });
   const options1 = { style: "currency", currency: "COP" };
   const numberFormat1 = new Intl.NumberFormat("es-CO", options1);
 
@@ -307,6 +315,20 @@ async function lista_creditosxcliente(id) {
 async function create_aprobacion_credito(datos) {
 
   var data = await Creditos.findOne({ where: { id: datos.id } });
+  var cliente = await Cliente.findOne({ where: { id: data.id_cliente } });
+
+  //valido si no se echo efectivo la deduccion para cambiar de estado
+  if( ( datos.id_credito_estado === 2 ) && ( cliente.cobro_descu_ref === 'SI' ) ){
+    // se actualiza estado descuento
+    try {
+      await cliente.update({cobro_descu_ref:'NO'});
+    } catch (error) {
+      return {
+        successful: false,
+        data: "Error Al intentar Guardar en base de datos",
+      };
+    }
+  }
 
   // se actualiza pago
   try {
@@ -401,72 +423,13 @@ async function lista_pago_cuotasxuser(id){
   return ({ successful: true, data: data });
 }
 
-/*async function lista_pago_cuotasxuser(id) {
-  var select1 = `SELECT 
-	  cc.id AS id_credito,
-    c.id,
-    c.email,
-    c.num_celular,
-    ci.dpto,
-    ci.ciudad,
-    CONCAT(ci.nombres_cliente, " ", ci.apellidos_cliente) AS nom_completo,
-    ci.direccion,
-    num_documento,
-    utd.nombre_tipo_doc,
-    ci.fecha_nac,
-    ci.foto_cliente,
-    ct.nombre_tipo_cliente,
-    ce.nombre_credito_tipo,
-    cc.num_cuenta,
-    cc.tipo_cobro,
-    cc.num_cuotas,
-    cc.valor_credito,
-    cc.valor_interes,
-    cc.valor_interes_mora,
-    cc.frecuencia_cobro,
-    cc.fec_desembolso,
-    cb.nombre_credito_bancos
-  FROM clientes AS c
-  INNER JOIN cliente_infos AS ci ON c.id = ci.id_cliente
-  INNER JOIN user_tipo_docs AS utd ON utd.id = ci.id_user_tipo_doc
-  INNER JOIN cliente_tipos AS ct ON ct.id = c.id_cliente_tipo
-  INNER JOIN creditos AS cc ON c.id = cc.id_cliente
-  INNER JOIN credito_estados AS ce ON ce.id = cc.id_credito_estado
-  INNER JOIN credito_bancos AS cb ON cb.id = cc.id_banco
-  WHERE c.id_cliente_tipo = 2 AND 
-  cc.id_credito_estado = 2 AND 
-  c.id_usuario = ${id}`;
-  const cliente_array = await Creditos.sequelize.query(select1, { type: QueryTypes.SELECT });
-
-  var select1 = `SELECT cpe.nombre_estado_pago, cpc.* FROM credito_pago_cuotas AS cpc 
-  INNER JOIN credito_pago_estados AS cpe ON cpc.id_credito_pago_estado = cpe.id
-  INNER JOIN creditos AS c ON c.id = cpc.id_credito
-  WHERE cpc.id_user_cobra = ${id}`;
-  const pagos_cuotas = await Creditos.sequelize.query(select1, { type: QueryTypes.SELECT });
-
-  var array1 = [];
-  var array2 = [];
-
-  cliente_array.forEach(ele1 => {
-    pagos_cuotas.forEach(ele2 => {
-      if( parseInt(ele1.id_credito) === parseInt(ele2.id_credito) ){
-        array2.push(ele2);
-      }
-    });
-    ele1.pago_cuotas = array2;
-    array1.push(ele1);
-  });
-
-  return ({ successful: false, data: array1 });
-}*/
-
 async function update_aprobacion_pago_cuotaxadmin(datos) {
 
   var data = await Credito_pago_cuotas.findOne({ where: { id: datos.id } });
   const credito = await Creditos.findOne({ where: { id: data.id_credito } });
   var val_pagado = null
   if( parseInt( datos.id_credito_pago_estado ) === 3){
-    val_pagado = (credito.valor_credito / credito.num_cuotas) + credito.valor_interes;
+    val_pagado = (credito.valor_credito / credito.num_cuotas) + credito.valor_interes - credito.val_descu_ref;
     if( moment().format('YYYY-MM-DD') > data.fecha_estimada_pago ){
       val_pagado += credito.valor_interes_mora;
     }

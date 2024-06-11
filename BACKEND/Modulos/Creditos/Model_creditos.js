@@ -62,6 +62,10 @@ const Tipo_doc = sequelize.define("credito", {
     type: DataTypes.INTEGER,
     allowNull: true
   },
+  val_descu_ref: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
   frecuencia_cobro: {
     type: DataTypes.INTEGER,
     allowNull: false

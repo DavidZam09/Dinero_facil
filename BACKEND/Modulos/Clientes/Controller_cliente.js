@@ -14,6 +14,8 @@ module.exports = {
     lista_cliente_infoxcliente,
     input_cliente_info,
     borrarContenidoCarpeta,
+    val_correo_cliente,
+    cambio_pass,
     lista_clientesxadmin,
     update_aprobacion_cliente,
     get_doc
@@ -54,6 +56,26 @@ function update_aprobacion_cliente(req, res, next) {
         return res.json({ successful: false, errors: errors.array() });
     }
     Cliente.update_aprobacion_cliente(req.body).then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+function val_correo_cliente(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
+    Cliente.val_correo_cliente(req.query).then((respuerta) => {
+        return res.send(respuerta);
+    });
+}
+
+function cambio_pass(req, res, next) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.json({ successful: false, errors: errors.array() });
+    }
+    Cliente.cambio_pass(req.body).then((respuerta) => {
         return res.send(respuerta);
     });
 }

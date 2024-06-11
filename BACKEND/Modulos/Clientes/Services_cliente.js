@@ -1,4 +1,4 @@
-const { QueryTypes, Op } = require("sequelize");
+const { QueryTypes, Op, where } = require("sequelize");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const fs = require("fs");
@@ -7,6 +7,7 @@ const moment = require('moment');
 
 const Clientes_tipo = require("./Model_clientes_tipo");
 const Cliente = require("./Model_cliente");
+const Cliente_recupera_pass = require("./Model_cliente_recupera_pass");
 
 const Actividad_eco = require("./Model_clientes_actividad_eco");
 const Sector_eco = require("./Model_clientes_sector_eco");
@@ -33,7 +34,9 @@ module.exports = {
   lista_cliente_infoxcliente,
   input_cliente_info,
   lista_clientesxadmin,
-  update_aprobacion_cliente
+  update_aprobacion_cliente,
+  val_correo_cliente,
+  cambio_pass
 };
 
 /////////////////////////////////////////////////////////////////// Servicios de los Admin //////////////////////////////////////////////////////////////////
@@ -48,7 +51,7 @@ async function lista_clientesxadmin(data) {
   }
 
   var select = `SELECT ci.*, c.num_celular, c.email, ct.nombre_tipo_cliente, 
-  utd.nombre_tipo_doc, cae.nombre_actividad_eco, cse.nombre_sector_eco
+  utd.nombre_tipo_doc, cae.nombre_actividad_eco, cse.nombre_sector_eco, c.cobro_descu_ref
   FROM cliente_infos AS ci
   INNER JOIN user_tipo_docs AS utd ON  ci.id_user_tipo_doc = utd.id
   INNER JOIN cliente_actividad_ecos AS cae ON  ci.id_cliente_actividad_eco = cae.id
@@ -100,7 +103,6 @@ async function update_aprobacion_cliente( req ) {
 /////////////////////////////////////////////////////////////////// Servicios de los clientes //////////////////////////////////////////////////////////////////
 
 /* servivios de cliente */
-
 async function lista_cliente_tipos() {
   return { successful: true, data: await Clientes_tipo.findAll() };
 }
@@ -130,6 +132,7 @@ async function registrar_cliente(data) {
   data.password = await bcrypt.hash(data.password, salt);
   data.cod_personal = cod;
   data.id_cliente_tipo = 1;
+  data.cobro_descu_ref = data.cod_referido===null?'NO':'SI';
 
   var cliente = null;
   try {
@@ -212,7 +215,7 @@ async function lista_sector_eco() {
 
 async function lista_cliente_infoxcliente(id) {
   var select = `SELECT ci.*, cae.nombre_actividad_eco, cse.nombre_sector_eco, 
-  utd.nombre_tipo_doc, c.email, c.num_celular FROM cliente_infos AS ci 
+  utd.nombre_tipo_doc, c.email, c.num_celular, c.cobro_descu_ref FROM cliente_infos AS ci 
   INNER JOIN clientes AS c ON c.id = ci.id_cliente
   INNER JOIN cliente_actividad_ecos AS cae ON cae.id = ci.id_cliente_actividad_eco 
   INNER JOIN cliente_sector_ecos AS cse ON cse.id = ci.id_cliente_sector_eco 
@@ -346,4 +349,70 @@ async function input_cliente_info(datos) {
   await Email.sendMail(transporter2, mailOptions2);
 
   return resp
+}
+
+async function val_correo_cliente(datos) {
+
+  const cod = generarCodigoUnico();
+  const cliente = await Cliente.findOne( { where: { email: datos.email } } );
+
+  //borro los codigos viejos
+  try {
+    await Cliente_recupera_pass.destroy( { where: { id_cliente: cliente.id } } );
+    console.log(`ID ${cliente.id} eliminado exitosamente`);
+  } catch (error) {
+    console.error(error);
+  }
+
+  var input = {
+    id_cliente: cliente.id,
+    cod_recupera: cod
+  }
+
+  try {
+      await Cliente_recupera_pass.create(input); // guardo
+  } catch (error) {
+    return {
+      successful: false,
+      data: "Error Al intentar Guardar en base de datos",
+    };
+  }
+
+  const mensajes = await Config_mensajes.findAll({
+    where:{
+       id: { [Op.in]: [14] }
+    }
+ });
+
+  // envio de correo cliente
+  const correo_envia = await Config.findOne({ where: { id: 4 } });
+  var text = mensajes[0].mensaje.replace('||1', cod);
+  const mailOptions1 = {
+    from: correo_envia.valor_variable,
+    to: datos.email,
+    subject: mensajes[0].asunto_mensaje,
+    text: text
+  };
+  const transporter1 = await Email.createTransporter();
+  await Email.sendMail(transporter1, mailOptions1);
+  return {
+    successful: true,
+    data: "Se ha generado y enviado el codigo al correo del cliente",
+  };
+}
+
+async function cambio_pass(data){
+  const salt = await bcrypt.genSalt(Number(process.env.SAL_ROUND));
+  var upd = {
+    password: await bcrypt.hash(data.password, salt)
+  } 
+  const cliente = await Cliente.findOne({ where: { email: data.email } });
+  try {
+    await cliente.update(upd);
+    await Cliente_recupera_pass.destroy( { where: { id_cliente: cliente.id } } );
+    return { successful: true, error: "El cambio de la contraseña fue exitos" };
+  } catch (error) {
+    console.log(error);
+    return { successful: false, error: error };
+  }
 }

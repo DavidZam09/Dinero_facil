@@ -26,6 +26,10 @@ app.get('/documento/get_doc', clientes.get_doc);
 app.get('/cliente/lista_tipo_doc', User.lista_tipo_doc);
 app.get('/cliente/lista_config', User.lista_config);
 
+//recupera pass
+app.get('/clientes/val_correo_cliente', Val.val_correo_cliente, clientes.val_correo_cliente);
+app.post('/clientes/cambio_pass', Val.cambio_pass, clientes.cambio_pass);
+
 /////////////////////////////////////////////////////////////////// Servicios de los Admin //////////////////////////////////////////////////////////////////
 app.get('/admin/cliente/lista_clientesxadmin', Val.lista_clientesxadmin, clientes.lista_clientesxadmin);
 app.post('/admin/cliente/update_aprobacion_cliente', Val.update_aprobacion_cliente, clientes.update_aprobacion_cliente);

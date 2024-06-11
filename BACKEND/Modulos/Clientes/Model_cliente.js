@@ -46,6 +46,10 @@ const Cliente = sequelize.define("cliente", {
         type: DataTypes.STRING,
         allowNull: false,
         unique: true
+    },
+    cobro_descu_ref: {
+        type: DataTypes.STRING,
+        allowNull: true
     }
 });
 

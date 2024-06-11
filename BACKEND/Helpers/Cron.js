@@ -22,7 +22,7 @@ const test = async () => {
 //asignacion de colaborador a credito pago
 const Asignar_Cobrador = async () => {
   // consulto cobros en efectivos de proximos a 2 dias
-  const select1 = `SELECT cpc.*, (c.valor_credito / c.num_cuotas) + c.valor_interes as val_cuota, 
+  const select1 = `SELECT cpc.*, (c.valor_credito / c.num_cuotas) + c.valor_interes - c.val_descu_ref as val_cuota, 
   cc.email, cc.num_celular, CONCAT(ci.nombres_cliente, " ", ci.apellidos_cliente) AS nom_compleo  
   from credito_pago_cuotas as cpc 
   inner join creditos as c on cpc.id_credito = c.id
@@ -88,7 +88,7 @@ const Asignar_Cobrador = async () => {
 //aviso credito pago
 const Recordatorio_pago_cobro = async () => {
   // consulto cobros hoy
-  const select1 = `SELECT cpc.*, (c.valor_credito / c.num_cuotas) + c.valor_interes as val_cuota, 
+  const select1 = `SELECT cpc.*, (c.valor_credito / c.num_cuotas) + c.valor_interes - c.val_descu_ref as val_cuota, 
   c.valor_credito, c.num_cuotas,
   cc.email, cc.num_celular, CONCAT(ci.nombres_cliente, " ", ci.apellidos_cliente) AS nom_compleo  
   from credito_pago_cuotas as cpc 
@@ -134,7 +134,7 @@ const Recordatorio_pago_cobro = async () => {
 //aviso credito pago
 const Aviso_mora_pago_cuota = async () => {
   // consulto cobros en mora
-  const select1 = `SELECT cpc.*, (c.valor_credito / c.num_cuotas) + c.valor_interes + c.valor_interes_mora as val_cuota, 
+  const select1 = `SELECT cpc.*, (c.valor_credito / c.num_cuotas) + c.valor_interes + c.valor_interes_mora - c.val_descu_ref as val_cuota, 
   c.valor_credito, c.num_cuotas, c.valor_interes_mora, DATEDIFF( DATE(NOW()),  cpc.fecha_estimada_pago ) AS dias_mora,
   cc.email, cc.num_celular, CONCAT(ci.nombres_cliente, " ", ci.apellidos_cliente) AS nom_compleo  
   from credito_pago_cuotas as cpc 
